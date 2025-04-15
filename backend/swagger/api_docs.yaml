@@ -1,0 +1,857 @@
+
+swagger: "2.0"
+info:
+  title: tinyConcerts API
+  description: this is the tinyConcerts API :D
+  version: 1.0.0
+basePath: /
+schemes:
+  - http
+paths:
+  /api/auth/logout:
+    post:
+      summary: Logout
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              token: token
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/auth/login:
+    post:
+      summary: Login
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              username: username
+              password: password
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/user:
+    post:
+      summary: Create User
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            example:
+              fname: fname
+              lname: lname
+              username: username
+              email: email
+              birthday: birthday
+              password: password
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    get:
+      summary: Get User By Id
+      tags:
+        - User
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    put:
+      summary: Update User
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            example:
+              user_id: user_id
+              fname: fname
+              lname: lname
+              username: username
+              email: email
+              birthday: birthday
+              password: password
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    delete:
+      summary: Delete User
+      tags:
+        - User
+      parameters:
+      - name: user_id
+        in: query
+        required: true
+        schema:
+          type: number
+        example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/user/all:
+    get:
+      summary: Get All Users
+      tags:
+        - User
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/user/achievements:
+    get:
+      summary: Get User Achievement By Id
+      tags:
+        - User
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/video:
+    post:
+      summary: Create Video
+      tags:
+        - Video
+      requestBody:
+        content:
+          application/json:
+            example:
+              title: New Concert
+              description: Amazing live show!
+              video_link: https://example.com/newvideo
+              category: Pop
+              published_at: '2025-04-01T12:00:00Z'
+              owner: Artist Name
+              owner_url: https://example.com/artist
+              image_320_180: https://example.com/thumb.jpg
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    get:
+      summary: Get Video By Id
+      tags:
+        - Video
+      parameters:
+        - name: video_id
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    put:
+      summary: Update Video
+      tags:
+        - Video
+      requestBody:
+        content:
+          application/json:
+            example:
+              video_id: id
+              title: New Concert
+              description: Amazing live show!
+              video_link: https://example.com/newvideo
+              category: Pop
+              published_at: '2025-04-01T12:00:00Z'
+              owner: Artist Name
+              owner_url: https://example.com/artist
+              image_320_180: https://example.com/thumb.jpg
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    delete:
+      summary: Delete Video
+      tags:
+        - Video
+      parameters:
+      - name: video_id
+        in: query
+        required: true
+        schema:
+          type: string
+        example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/video/search:
+    get:
+        summary: Search videos
+        tags:
+          - Video
+        responses:
+          '200':
+            description: Success
+          '400':
+            description: Bad Request
+          '403':
+            description: Forbidden
+          '404':
+            description: Not Found
+          '500':
+            description: Internal Server Error
+  /api/video/report:
+    post:
+      summary: Report a Video
+      tags:
+        - Video
+      requestBody:
+        content:
+          application/json:
+            example:
+              video_id: video_id
+              report_reason: Inappropriate content
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/playlist:
+    post:
+      summary: Create Playlist
+      tags:
+        - Playlist
+      requestBody:
+        content:
+          application/json:
+            example:
+              user_id: user_id
+              name: My Rock Playlist
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    get:
+      summary: Get Playlist by Id
+      tags:
+        - Playlist
+      parameters:
+        - name: playlist_id
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error      
+    put:
+      summary: Update Playlist
+      tags:
+        - Playlist
+      requestBody:
+        content:
+          application/json:
+            example:
+              playlist_id: playlist_id
+              user_id: user_id
+              name: My Rock Playlist
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    delete:
+      summary: Delete Playlist
+      tags:
+        - Playlist
+      parameters:
+      - name: playlist_id
+        in: query
+        required: true
+        schema:
+          type: number
+        example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/playlist/user:
+    get:
+      summary: Get Playlists By User
+      tags:
+        - Playlist
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/playlist/video:
+    delete:
+      summary: Delete Video From Playlist
+      tags:
+        - Playlist
+      parameters:
+      - name: video_id
+        in: query
+        required: true
+        schema:
+          type: number
+        example: "123"
+      - name: playlist_id
+        in: query
+        required: true
+        schema:
+          type: number
+        example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/like:
+    post:
+      summary: Update Like Status
+      tags:
+        - Like
+      requestBody:
+        content:
+          application/json:
+            example:
+              user_id: user_id
+              video_id: video_id
+              like: true
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/like/user:
+    get:
+      summary: Get Likes Per User
+      tags:
+        - Like
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/like/video:
+    get:
+      summary: Get Likes Per Video
+      tags:
+        - Like
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error        
+  /api/comment:
+    post:
+      summary: Create Comment
+      tags:
+        - Comment
+      requestBody:
+        content:
+          application/json:
+            example:
+              user_id: user_id
+              video_id: video_id
+              comment_text: This is an amazing concert!
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    put:
+      summary: Update Comment
+      tags:
+        - Comment
+      requestBody:
+        content:
+          application/json:
+            example:
+              user_id: user_id
+              video_id: video_id
+              comment_id: comment_id
+              comment_text: This concert was absolutely phenomenal!
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    get:
+      summary: Get Comments By Id
+      tags:
+        - Comment
+      parameters:
+        - name: comment_id
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    delete:
+      summary: Delete Comment
+      tags:
+        - Comment
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/comment/video:
+    get:
+      summary: Get Comments Per Video
+      tags:
+        - Comment
+      parameters:
+        - name: video_id
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/comment/user:
+    get:
+      summary: Get Comments Per User
+      tags:
+        - Comment
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/comment/report:
+    post:
+      summary: Report Comment
+      tags:
+        - Comment
+      requestBody:
+        content:
+          application/json:
+            example:
+              comment_id: comment_id
+              report_reason: Inappropriate content
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/report:
+    get:
+      summary: Get All Reports
+      tags:
+        - Report
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/report/video:
+    get:
+      summary: Get Reports For Video
+      tags:
+        - Report
+      parameters:
+        - name: video_id
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/report/comment:
+    get:
+      summary: Get Reports For Comment
+      tags:
+        - Report
+      parameters:
+        - name: comment_id
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error     
+  /api/report/user:
+    get:
+      summary: Get Reports Made By User
+      tags:
+        - Report
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error          
+  /api/report/status:
+    patch:
+      summary: Update Report Status
+      tags:
+        - Report
+      requestBody:
+        content:
+          application/json:
+            example:
+              report_id: report_id
+              status: approved/rejected
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/rating:
+    post:
+      summary: Create Rating for Video
+      tags:
+        - Rating
+      requestBody:
+        content:
+          application/json:
+            example:
+              video_id: video_id
+              rating: 0-5
+              user_id: user_id
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    get:
+      summary: Get Average Rating for Video
+      tags:
+        - Rating
+      parameters:
+      - name: video_id
+        in: query
+        required: true
+        schema:
+          type: number
+        example: "123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /api/achievement:
+    post:
+      summary: Update Achievement
+      tags:
+        - Achievement
+      requestBody:
+        content:
+          application/json:
+            example:
+              achievement_id: achievement_id
+              name: name
+              description: description
+              required_count: required_count
+              type: VIEWS/COMMENTS/LIKES
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    get:
+      summary: Get Achievement
+      tags:
+        - Achievement
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
