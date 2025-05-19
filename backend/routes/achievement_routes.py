@@ -5,7 +5,7 @@ achievement_bp = Blueprint('achievement_bp', 'achievement', url_prefix='/api/ach
 
 
 @achievement_bp.route('')
-@swag_from('..\\swagger\\api_docs.yaml')
+@swag_from('../swagger/api_docs.yaml')
 def update_achievement():
     """Update Achievement"""
     data = request.get_json()
@@ -15,7 +15,7 @@ def update_achievement():
 
 
 @achievement_bp.route('')
-@swag_from('..\\swagger\\api_docs.yaml')
+@swag_from('../swagger/api_docs.yaml')
 def get_achievement():
     """Get Achievement"""
     return jsonify({"message": "Not implemented yet"}), 501

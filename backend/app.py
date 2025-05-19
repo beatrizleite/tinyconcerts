@@ -7,7 +7,7 @@ from database import init_db
 
 app = Flask(__name__)
 
-swagger = Swagger(app, template_file='swagger\\api_docs.yaml')
+swagger = Swagger(app, template_file='swagger/api_docs.yaml')
 
 CORS(app)
 
