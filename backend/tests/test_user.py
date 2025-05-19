@@ -12,7 +12,7 @@ def client():
         yield client
 
 def test_get_users(client):
-    response = client.get('/users')
+    response = client.get('/api/user')
     assert response.status_code == 200
     assert isinstance(response.json, list)
 
@@ -21,6 +21,6 @@ def test_create_user(client):
         "name": "Test User",
         "email": "test@example.com"
     }
-    response = client.post('/users', json=payload)
+    response = client.post('/api/user', json=payload)
     assert response.status_code in (200, 201)
     assert "id" in response.json or "message" in response.json
