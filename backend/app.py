@@ -20,4 +20,7 @@ def home():
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True, host=config.FLASK_RUN_HOST, port=int(config.FLASK_RUN_PORT))
+    app.run(
+        debug=True, 
+        host=config.FLASK_RUN_HOST, 
+        port=int(config.FLASK_RUN_PORT))
