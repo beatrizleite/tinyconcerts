@@ -9,7 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: ${{ secrets.DB_URL }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -20,6 +20,11 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install ODBC driver for SQL Server
+        run: |
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
+
       - name: Install Python dependencies
         working-directory: backend
         run: |
@@ -29,11 +34,7 @@ jobs:
 
       - name: Run backend tests
         working-directory: backend
-        env: 
-          DATABASE_URL: ${{ secrets.DB_URL }}
-        run: |
-            echo "DATABASE_URL: $DATABASE_URL"
-            pytest
+        run: pytest
 
       - name: Lint backend code
         working-directory: backend
