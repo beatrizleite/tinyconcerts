@@ -29,7 +29,11 @@ jobs:
 
       - name: Run backend tests
         working-directory: backend
-        run: pytest
+        run: |
+            echo "DATABASE_URL: $DATABASE_URL"
+            pytest
+        env: 
+          DATABASE_URL: ${{ secrets.DB_URL }}
 
       - name: Lint backend code
         working-directory: backend

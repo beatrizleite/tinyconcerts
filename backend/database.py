@@ -3,9 +3,10 @@ from sqlalchemy import create_engine
 import config
 from models.base import Base
 
-DATABASE_URL = config.DATABASE_URL
+if not config.DATABASE_URL:
+    raise ValueError("DATABASE_URL is not set.")
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(config.DATABASE_URL)
 db_session = scoped_session(sessionmaker(bind=engine))
 
 Base.query = db_session.query_property()
