@@ -49,7 +49,7 @@ jobs:
 
       - name: Run frontend tests
         working-directory: frontend
-        run: npm test -- --watchAll=false
+        run: CI=true npm test -- --watchAll=false
 
   deploy:
     needs: test
