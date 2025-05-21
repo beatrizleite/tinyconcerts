@@ -9,8 +9,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      # Use test DB for pytest
       TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      PYTHONPATH: ./backend
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
