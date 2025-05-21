@@ -21,7 +21,12 @@ def create_user():
 @swag_from('../swagger/api_docs.yaml', methods=['GET'])
 def get_user_by_id():
     """Get User By Id"""
-    user_id = request.args.get('user_id')
+    user_id_str = request.args.get('user_id')
+    try:
+        user_id = int(user_id_str)
+    except (TypeError, ValueError):
+        return jsonify({"error": "Invalid user_id"}), 400
+    
     user = user_service.getUser(user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
@@ -32,14 +37,17 @@ def get_user_by_id():
 @swag_from('../swagger/api_docs.yaml', methods=['PUT'])
 def update_user():
     """Update User"""
-    data = request.get_json()
-    user_id = data.get("id")
-    if not user_id:
-        return jsonify({"error": "Missing user id"}), 400
-    updated = user_service.updateUser(user_id, data)
-    if not updated:
-        return jsonify({"error": "User not found"}), 404
-    return jsonify({"message": "User updated"}), 200
+    def updateUser(self, user_id, data):
+    user = self.repo.getById(user_id)
+    if not user:
+        return None
+    password = data.pop('password', None)
+    if password:
+        user.password_hash = generate_password_hash(password)
+    for key, value in data.items():
+        if key not in ['password_hash', 'id']:
+            setattr(user, key, value)
+    return self.repo.update(user)
 
 
 @user_bp.route('', methods=['DELETE'])
