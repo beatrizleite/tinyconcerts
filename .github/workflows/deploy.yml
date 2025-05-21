@@ -1,0 +1,62 @@
+name: CI/CD Pipeline for Frontend & Backend
+
+on:
+  push:
+    branches:
+      - deploy
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      PYTHONPATH: ./backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      ### BACKEND ###
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest flake8
+
+      - name: Run backend tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+        run: python -m pytest backend/tests
+
+      - name: Lint backend code
+        working-directory: backend
+        run: flake8 . || true
+
+      ### FRONTEND ###
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run frontend tests
+        working-directory: frontend
+        run: CI=true npm test -- --watchAll=false
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel Deploy
+        run: curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
+
+      - name: Trigger Render Deploy
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"

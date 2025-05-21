@@ -11,7 +11,7 @@ function App() {
   )
 
   useEffect(() => {
-    axios.get(`${API_URL}/api/hello`)
+    axios.get(`${API_URL}/`)
       .then((response) => {
         setMessage(response.data.message);
       })

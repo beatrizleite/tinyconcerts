@@ -3,7 +3,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-FLASK_RUN_HOST = os.getenv("FLASK_RUN_HOST")
-FLASK_RUN_PORT = os.getenv("FLASK_RUN_PORT")
-DATABASE_URL = f"mssql://{os.getenv('DB_USERNAME')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+
+FLASK_RUN_HOST = os.getenv("FLASK_RUN_HOST", "0.0.0.0")
+FLASK_RUN_PORT = os.getenv("FLASK_RUN_PORT", 5000)
+DATABASE_URL = os.getenv("DATABASE_URL")
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 

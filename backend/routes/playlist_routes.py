@@ -4,7 +4,7 @@ from flasgger import swag_from
 playlist_bp = Blueprint('playlist_bp', __name__, url_prefix='/api/playlist')
 
 @playlist_bp.route('', methods=['POST'])
-@swag_from('..\\swagger\\api_docs.yaml', methods=['POST'])
+@swag_from('../swagger/api_docs.yaml', methods=['POST'])
 def create_playlist():
     """Create Playlist"""
     data = request.get_json()
@@ -14,7 +14,7 @@ def create_playlist():
 
 
 @playlist_bp.route('', methods=['GET'])
-@swag_from('..\\swagger\\api_docs.yaml', methods=['GET'])
+@swag_from('../swagger/api_docs.yaml', methods=['GET'])
 def get_playlist_by_id():
     """Get Playlist by Id"""
     playlist_id = request.args.get('playlist_id')
@@ -22,7 +22,7 @@ def get_playlist_by_id():
 
 
 @playlist_bp.route('', methods=['PUT'])
-@swag_from('..\\swagger\\api_docs.yaml', methods=['PUT'])
+@swag_from('../swagger/api_docs.yaml', methods=['PUT'])
 def update_playlist():
     """Update Playlist"""
     data = request.get_json()
@@ -32,7 +32,7 @@ def update_playlist():
 
 
 @playlist_bp.route('', methods=['DELETE'])
-@swag_from('..\\swagger\\api_docs.yaml', methods=['DELETE'])
+@swag_from('../swagger/api_docs.yaml', methods=['DELETE'])
 def delete_playlist():
     """Delete Playlist"""
     playlist_id = request.args.get('playlist_id')
@@ -40,7 +40,7 @@ def delete_playlist():
 
 
 @playlist_bp.route('/user', methods=['GET'])
-@swag_from('..\\swagger\\api_docs.yaml', methods=['GET'])
+@swag_from('../swagger/api_docs.yaml', methods=['GET'])
 def get_playlists_by_user():
     """Get Playlists By User"""
     user_id = request.args.get('user_id')
@@ -48,7 +48,7 @@ def get_playlists_by_user():
 
 
 @playlist_bp.route('/video', methods=['DELETE'])
-@swag_from('..\\swagger\\api_docs.yaml', methods=['DELETE'])
+@swag_from('../swagger/api_docs.yaml', methods=['DELETE'])
 def delete_video_from_playlist():
     """Delete Video From Playlist"""
     playlist_id = request.args.get('playlist_id')

@@ -3,10 +3,10 @@ swagger: "2.0"
 info:
   title: tinyConcerts API
   description: this is the tinyConcerts API :D
-  version: 1.0.0
+  version: 1.0
 basePath: /
 schemes:
-  - http
+  - https
 paths:
   /api/auth/logout:
     post:
@@ -56,27 +56,57 @@ paths:
       summary: Create User
       tags:
         - User
-      requestBody:
-        content:
-          application/json:
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: user
+          required: true
+          schema:
+            type: object
+            required:
+              - fname
+              - lname
+              - username
+              - email
+              - birthday
+              - password
+            properties:
+              fname:
+                type: string
+              lname:
+                type: string
+              username:
+                type: string
+              email:
+                type: string
+              birthday:
+                type: string
+                format: date
+              password:
+                type: string
             example:
-              fname: fname
-              lname: lname
-              username: username
-              email: email
-              birthday: birthday
-              password: password
+              fname: John
+              lname: Doe
+              username: johndoe
+              email: john@example.com
+              birthday: 1990-01-01
+              password: secret123
       responses:
-        '200':
-          description: Success
+        '201':
+          description: User created successfully
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+              username:
+                type: string
         '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
+          description: Missing or invalid input
         '500':
-          description: Internal Server Error
+          description: Internal server error
+
     get:
       summary: Get User By Id
       tags:
@@ -85,68 +115,105 @@ paths:
         - name: user_id
           in: query
           required: true
-          schema:
-            type: string
+          type: string
           example: "123"
       responses:
         '200':
-          description: Success
-        '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
+          description: User found
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+              username:
+                type: string
         '404':
-          description: Not Found
+          description: User not found
+        '400':
+          description: Missing or invalid user_id
         '500':
-          description: Internal Server Error
+          description: Internal server error
+
     put:
       summary: Update User
       tags:
         - User
-      requestBody:
-        content:
-          application/json:
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: user
+          required: true
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: string
+              fname:
+                type: string
+              lname:
+                type: string
+              username:
+                type: string
+              email:
+                type: string
+              birthday:
+                type: string
+                format: date
+              password:
+                type: string
             example:
-              user_id: user_id
-              fname: fname
-              lname: lname
-              username: username
-              email: email
-              birthday: birthday
-              password: password
+              id: "123"
+              fname: Jane
+              lname: Doe
+              username: janedoe
+              email: jane@example.com
+              birthday: 1992-02-02
+              password: newpassword
       responses:
         '200':
-          description: Success
+          description: User updated successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: User updated
         '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
+          description: Missing user id or invalid input
         '404':
-          description: Not Found
+          description: User not found
         '500':
-          description: Internal Server Error
+          description: Internal server error
+
     delete:
       summary: Delete User
       tags:
         - User
       parameters:
-      - name: user_id
-        in: query
-        required: true
-        schema:
-          type: number
-        example: "123"
+        - name: user_id
+          in: query
+          required: true
+          type: string
+          example: "123"
       responses:
         '200':
-          description: Success
-        '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
+          description: User deleted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: User deleted
         '404':
-          description: Not Found
+          description: User not found
+        '400':
+          description: Missing or invalid user_id
         '500':
-          description: Internal Server Error
+          description: Internal server error
+
   /api/user/all:
     get:
       summary: Get All Users
@@ -154,15 +221,18 @@ paths:
         - User
       responses:
         '200':
-          description: Success
-        '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
+          description: List of users
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                username:
+                  type: string
         '500':
-          description: Internal Server Error
+          description: Internal server error
   /api/user/achievements:
     get:
       summary: Get User Achievement By Id
