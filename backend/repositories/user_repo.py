@@ -1,9 +1,8 @@
 from models.user import User
-from database import db_session
 
 
 class UserRepo:
-    def __init__(self):
+    def __init__(self, db_session):
         self.db = db_session
 
     def getById(self, user_id: int):

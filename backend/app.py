@@ -13,7 +13,6 @@ def create_app(test_config=None):
 
     CORS(app, resources={r"/api/*": {"origins": "*"}},
          supports_credentials=True)
-    register_routes(app)
 
     if test_config is None:
         database_url = os.getenv('DATABASE_URL') or getattr(config,
@@ -26,6 +25,8 @@ def create_app(test_config=None):
     else:
         app.config.update(test_config)
         init_db(app.config.get('DATABASE_URL'))
+
+    register_routes(app)
 
     @app.route('/')
     def home():
