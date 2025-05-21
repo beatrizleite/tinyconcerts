@@ -7,9 +7,12 @@ from app import create_app
 
 @pytest.fixture
 def client():
-    app = create_app()
-    app.config['TESTING'] = True
-    app.config['DATABASE_URL'] = "sqlite:///:memory:"
+    test_config = {
+        'TESTING': True,
+        'DATABASE_URL': "sqlite:///:memory:"
+    }
+
+    app = create_app(test_config)
 
     with app.test_client() as client:
         yield client

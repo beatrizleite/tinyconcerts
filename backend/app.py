@@ -5,15 +5,19 @@ import config
 from routes import register_routes
 from database import init_db
 
-def create_app():
+def create_app(test_config=None):
     app = Flask(__name__)
     
     Swagger(app, template_file='swagger/api_docs.yaml')
     CORS(app)
     register_routes(app)
 
-    with app.app_context():
+    if test_config is None:
+        from config import DATABASE_URL
         init_db()
+    else:
+        app.config.update(test_config)
+        init_db(app.config.get('DATABASE_URL'))
 
     @app.route('/')
     def home():
