@@ -13,7 +13,10 @@ def create_app(test_config=None):
     register_routes(app)
 
     if test_config is None:
-        init_db()
+        database_url = os.getenv('DATABASE_URL') or getattr(config, 'DATABASE_URL', None)
+        if not database_url:
+            raise ValueError("DATABASE_URL is not set!")
+        init_db(database_url)
     else:
         app.config.update(test_config)
         init_db(app.config.get('DATABASE_URL'))
