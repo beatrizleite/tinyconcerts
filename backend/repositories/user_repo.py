@@ -12,7 +12,7 @@ class UserRepo:
         return self.db.query(User).all()
     
     def getByUsername(self, username: str):
-        return self.db.query(User).filter(User.username == username).first
+        return self.db.query(User).filter(User.username == username).first()
     
     def create(self, user: User):
         self.db.add(user)

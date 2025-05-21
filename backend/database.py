@@ -24,4 +24,4 @@ def init_db(db_url=None):
 
 def drop_db():
     global engine
-    Base.metada.drop_all(bind=engine)
+    Base.metadata.drop_all(bind=engine)
