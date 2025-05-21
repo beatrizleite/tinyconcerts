@@ -5,15 +5,14 @@ import config
 from routes import register_routes
 from database import init_db
 
+
 def create_app(test_config=None):
     app = Flask(__name__)
-    
     Swagger(app, template_file='swagger/api_docs.yaml')
     CORS(app)
     register_routes(app)
 
     if test_config is None:
-        from config import DATABASE_URL
         init_db()
     else:
         app.config.update(test_config)
@@ -24,6 +23,7 @@ def create_app(test_config=None):
         return "This is the API. swagger at /apidocs"
 
     return app
+
 
 if __name__ == '__main__':
     app = create_app()
