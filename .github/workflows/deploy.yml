@@ -29,8 +29,9 @@ jobs:
           pip install pytest flake8
 
       - name: Run backend tests
-        working-directory: backend
-        run: pytest
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+        run: python -m pytest backend/tests
 
       - name: Lint backend code
         working-directory: backend
