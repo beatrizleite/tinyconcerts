@@ -22,6 +22,6 @@ def test_create_user(client, user_service):
     assert "id" in response.json
 
 def test_get_users(client):
-    response = client.get('/api/user')
+    response = client.get('/api/user/all')
     assert response.status_code == 200
     assert isinstance(response.json, list)
