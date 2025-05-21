@@ -20,15 +20,16 @@ def session_factory(engine):
     return sessionmaker(bind=engine)
 
 @pytest.fixture(scope='function')
-def db_session(session_factory):
-    """Creates a new database session for a test."""
+def test_db_session(session_factory):
     session = scoped_session(session_factory)
-    db_session.configure(bind=session.bind)
+    from database import db_session as global_db_session
+    global_db_session.configure(bind=session.bind)
     yield session
     session.remove()
 
+
 @pytest.fixture(scope='function')
-def app(db_session):
+def app(test_db_session):
     """Create a Flask app configured for testing."""
     test_config = {
         'TESTING': True,

@@ -3,7 +3,7 @@ from services.user_service import UserService
 from repositories.user_repo import UserRepo
 
 @pytest.fixture
-def user_service(db_session):
+def user_service(test_db_session):
     repo = UserRepo(db_session)
     service = UserService(repo)
     return service
