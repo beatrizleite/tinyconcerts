@@ -1,5 +1,6 @@
 import pytest
-from app import create_app, db
+from app import app
+from database import db_session, init_db 
 from config import TestConfig
 
 @pytest.fixture
