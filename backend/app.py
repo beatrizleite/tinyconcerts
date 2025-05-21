@@ -13,11 +13,10 @@ def create_app(test_config=None):
     register_routes(app)
 
     if test_config is None:
-        app.config.from_object(config)
+        init_db()
     else:
         app.config.update(test_config)
-
-    init_db(app.config.get('DATABASE_URL'))
+        init_db(app.config.get('DATABASE_URL'))
 
     
     @app.route('/')
