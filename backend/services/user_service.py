@@ -12,6 +12,8 @@ class UserService:
         if raw_password is None:
             raise ValueError("Password is required")
         data['password_hash'] = generate_password_hash(raw_password)
+        if isinstance(data.get("birthday"), str):
+            data["birthday"] = datetime.strptime(data["birthday"], "%Y-%m-%d").date()
         user = User(**data)
         return self.repo.create(user)
     
