@@ -1,3 +1,4 @@
+import os
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy import create_engine
 from models.base import Base
