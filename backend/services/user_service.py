@@ -2,6 +2,7 @@ from models.user import User
 from repositories.user_repo import UserRepo
 from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash
+from datetime import datetime
 
 class UserService:
     def __init__(self, db_session: Session):
