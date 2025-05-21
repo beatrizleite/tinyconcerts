@@ -10,7 +10,7 @@ from database import init_db
 def create_app(test_config=None):
     app = Flask(__name__)
     Swagger(app, template_file='swagger/api_docs.yaml')
-    CORS(app)
+    CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
     register_routes(app)
 
     if test_config is None:
