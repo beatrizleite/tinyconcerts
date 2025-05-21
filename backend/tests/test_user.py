@@ -4,7 +4,7 @@ from repositories.user_repo import UserRepo
 
 @pytest.fixture
 def user_service(test_db_session):
-    repo = UserRepo(db_session)
+    repo = UserRepo(test_db_session)
     service = UserService(repo)
     return service
 
