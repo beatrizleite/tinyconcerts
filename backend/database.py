@@ -6,9 +6,9 @@ engine = None
 db_session = scoped_session(sessionmaker())
 
 def init_db(db_url=None):
-    if not database_url:
-        database_url = os.getenv('DATABASE_URL')
-    if not database_url:
+    db_url = database_url or os.getenv('DATABASE_URL')
+
+    if not db_url:
         raise ValueError("DATABASE_URL is not set!")
         
     global engine, db_session
