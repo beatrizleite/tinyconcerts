@@ -6,6 +6,11 @@ engine = None
 db_session = scoped_session(sessionmaker())
 
 def init_db(db_url=None):
+    if not database_url:
+        database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        raise ValueError("DATABASE_URL is not set!")
+        
     global engine, db_session
 
     from models import user, video, achievement, comment, like, playlist, playlist_video, rating, report
