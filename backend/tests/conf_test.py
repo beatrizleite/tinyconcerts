@@ -1,17 +1,33 @@
+import os
+import sys
 import pytest
-from app import app
-from database import db_session, init_db 
-from config import TestConfig
 
-@pytest.fixture
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from app import create_app
+from database import db_session, Base
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "sqlite:///:memory:")
+
+
+@pytest.fixture(scope='session')
 def app():
-    test_db_url = "sqlite:///:memory:"
-    init_db(test_db_url)
+    os.environ["DATABASE_URL"] = TEST_DATABASE_URL
 
-    yield flask_app
+    app = create_app()
 
-    drop_db()
+    engine = create_engine(TEST_DATABASE_URL)
+    TestingSession = sessionmaker(bind=engine)
+    db_session.configure(bind=engine)
+    Base.metadata.create_all(bind=engine)
 
-@pytest.fixture
+    yield app
+
+    Base.metadata.drop_all(bind=engine)
+    db_session.remove()
+
+@pytest.fixture(scope='session')
 def client(app):
-    return app.test_client()    
+    return app.test_client()

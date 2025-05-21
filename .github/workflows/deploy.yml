@@ -21,11 +21,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install ODBC driver for SQL Server (optional if not used)
-        run: |
-          sudo apt-get update
-          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
-
       - name: Install Python dependencies
         working-directory: backend
         run: |

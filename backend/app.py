@@ -1,27 +1,30 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flasgger import Swagger
 from flask_cors import CORS
-import config 
+import config
 from routes import register_routes
 from database import init_db
 
-app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
+    
+    Swagger(app, template_file='swagger/api_docs.yaml')
+    CORS(app)
+    register_routes(app)
 
-swagger = Swagger(app, template_file='swagger/api_docs.yaml')
+    with app.app_context():
+        init_db()
 
-CORS(app)
+    @app.route('/')
+    def home():
+        return "This is the API. swagger at /apidocs"
 
-register_routes(app)
-
-@app.route('/')
-def home():
-    return "This is the API. swagger at /apidocs"
-
+    return app
 
 if __name__ == '__main__':
-    init_db()
+    app = create_app()
     app.run(
-        debug=True, 
-        host=config.FLASK_RUN_HOST, 
+        debug=True,
+        host=config.FLASK_RUN_HOST,
         port=int(config.FLASK_RUN_PORT)
     )
