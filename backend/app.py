@@ -13,11 +13,13 @@ def create_app(test_config=None):
     register_routes(app)
 
     if test_config is None:
-        init_db()
+        app.config.from_object(config)
     else:
         app.config.update(test_config)
-        init_db(app.config.get('DATABASE_URL'))
 
+    init_db(app.config.get('DATABASE_URL'))
+
+    
     @app.route('/')
     def home():
         return "This is the API. swagger at /apidocs"
