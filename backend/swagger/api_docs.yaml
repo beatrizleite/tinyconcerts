@@ -3,10 +3,10 @@ swagger: "2.0"
 info:
   title: tinyConcerts API
   description: this is the tinyConcerts API :D
-  version: 1.0.0
+  version: 1.0
 basePath: /
 schemes:
-  - http
+  - https
 paths:
   /api/auth/logout:
     post:

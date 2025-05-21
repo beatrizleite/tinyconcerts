@@ -25,11 +25,15 @@ def create_app(test_config=None):
         "schemes": ["https"]
     })
 
-    CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
+    CORS(app, resources={r"/api/*": {"origins": "*"}},
+         supports_credentials=True)
     register_routes(app)
 
     if test_config is None:
-        database_url = os.getenv('DATABASE_URL') or getattr(config, 'DATABASE_URL', None)
+        database_url = os.getenv('DATABASE_URL') or getattr(config,
+                                                            'DATABASE_URL',
+                                                            None
+                                                            )
         if not database_url:
             raise ValueError("DATABASE_URL is not set!")
         init_db(database_url)
@@ -37,7 +41,6 @@ def create_app(test_config=None):
         app.config.update(test_config)
         init_db(app.config.get('DATABASE_URL'))
 
-    
     @app.route('/')
     def home():
         return "This is the API. swagger at /apidocs"
