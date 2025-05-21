@@ -4,12 +4,13 @@ on:
   push:
     branches:
       - deploy
-      
+
 jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      # Use test DB for pytest
+      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -20,7 +21,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install ODBC driver for SQL Server
+      - name: Install ODBC driver for SQL Server (optional if not used)
         run: |
           sudo apt-get update
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
