@@ -15,8 +15,7 @@ def init_db(db_url=None):
 
     global engine, db_session
 
-    # from models import user, video, achievement, comment, like, playlist,
-    # playlist_video, rating, report
+    from models import user, video, achievement, comment, like, playlist, playlist_video, rating, report
 
     engine = create_engine(db_url)
     db_session = scoped_session(sessionmaker(bind=engine))
