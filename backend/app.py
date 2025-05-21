@@ -9,7 +9,22 @@ from database import init_db
 
 def create_app(test_config=None):
     app = Flask(__name__)
-    Swagger(app, template_file='swagger/api_docs.yaml')
+    Swagger(app, template_file='swagger/api_docs.yaml', config={
+        "headers": [],
+        "specs": [
+            {
+                "endpoint": 'apispec',
+                "route": '/apispec.json',
+                "rule_filter": lambda rule: True,
+                "model_filter": lambda tag: True,
+            }
+        ],
+        "swagger_ui": True,
+        "specs_route": "/apidocs/",
+        "host": "tinyconcerts.onrender.com",
+        "schemes": ["https"]
+    })
+
     CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
     register_routes(app)
 
