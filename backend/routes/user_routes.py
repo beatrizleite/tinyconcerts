@@ -37,17 +37,21 @@ def get_user_by_id():
 @swag_from('../swagger/api_docs.yaml', methods=['PUT'])
 def update_user():
     """Update User"""
-    def updateUser(self, user_id, data):
-    user = self.repo.getById(user_id)
-    if not user:
-        return None
-    password = data.pop('password', None)
-    if password:
-        user.password_hash = generate_password_hash(password)
-    for key, value in data.items():
-        if key not in ['password_hash', 'id']:
-            setattr(user, key, value)
-    return self.repo.update(user)
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Missing JSON body"}), 400
+
+    user_id_str = request.args.get('user_id')
+    try:
+        user_id = int(user_id_str)
+    except (TypeError, ValueError):
+        return jsonify({"error": "Invalid user_id"}), 400
+
+    updated_user = user_service.updateUser(user_id, data)
+    if not updated_user:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify({"id": updated_user.id, "username": updated_user.username}), 200
 
 
 @user_bp.route('', methods=['DELETE'])
