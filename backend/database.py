@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from models.base import Base
 
 engine = None
-db_session = None
+db_session = scoped_session(sessionmaker())
 
 def init_db(db_url=None):
     global engine, db_session
