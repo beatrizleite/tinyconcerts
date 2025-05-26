@@ -9,7 +9,6 @@ from .user_routes import user_bp
 from .video_routes import video_bp
 
 
-
 def register_routes(app):
     app.register_blueprint(achievement_bp)
     app.register_blueprint(auth_bp)

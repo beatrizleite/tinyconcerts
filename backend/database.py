@@ -18,13 +18,12 @@ def init_db(db_url=None):
     from models import user, video, achievement, comment, like, playlist, playlist_video, rating, report
 
     engine = create_engine(db_url)
-    
+
     db_session.configure(bind=engine)
-    
+
     Base.query = db_session.query_property()
 
     Base.metadata.create_all(bind=engine)
-
 
 
 def drop_db():
