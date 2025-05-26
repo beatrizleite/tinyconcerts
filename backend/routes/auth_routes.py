@@ -1,8 +1,15 @@
 from flask import Blueprint, request, jsonify
 from flasgger import swag_from
 from database import db_session
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+    get_jwt_identity,
+    get_jwt
+)
 from services.user_service import UserService
+from utils.token_blacklist import add_token_to_blacklist
 import os
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/api/auth')
@@ -36,12 +43,15 @@ def register():
 
 @auth_bp.route('/logout', methods=['POST'])
 @swag_from(swagger_path, methods=['POST'])
+@jwt_required()
 def logout():
     """Logout"""
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Missing JSON body"}), 400
-    return jsonify({"message": "Not implemented yet"}), 501
+    jwt_data = get_jwt()
+    jti = jwt_data["jti"]
+    user_id = get_jwt_identity()
+    print(f"Logging out user {user_id} with jti {jti}")
+    add_token_to_blacklist(jti)
+    return jsonify({"message": "Successfully logged out"}), 200
 
 
 @auth_bp.route('/login', methods=['POST'])

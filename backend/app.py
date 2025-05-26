@@ -7,6 +7,7 @@ import config
 from routes import register_routes
 from database import init_db
 from flask_jwt_extended import JWTManager
+from utils.token_blacklist import is_token_revoked
 
 
 def create_app(test_config=None):
@@ -26,8 +27,6 @@ def create_app(test_config=None):
         app.config["JWT_TOKEN_LOCATION"] = ["headers"]
 
         jwt = JWTManager(app)
-
-        from utils.token_blacklist import is_token_revoked
 
         @jwt.token_in_blocklist_loader
         def check_if_token_revoked(jwt_header, jwt_payload):
