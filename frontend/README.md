@@ -1,3 +1,9 @@
+# Useful Links
+- ## [React cheatsheet](https://devhints.io/react)
+- ## [Tailwind cheatsheet](https://nerdcave.com/tailwind-cheat-sheet)
+- ## [React project folder structure](https://blog.webdevsimplified.com/2022-07/react-folder-structure/)
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
