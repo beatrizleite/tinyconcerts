@@ -6,6 +6,7 @@ from services.video_service import VideoService
 import os
 import datetime
 
+
 video_bp = Blueprint('video_bp', __name__, url_prefix='/api/video')
 video_service = VideoService(db_session)
 swagger_path = os.path.normpath(os.path.join(os.path.dirname(__file__),
@@ -129,3 +130,55 @@ def report_video():
     return jsonify(
         {"message": f"Video {video_id} reported for reason: {reason}"}
     ), 200
+
+
+@video_bp.route('/import', methods=['POST'])
+@swag_from(swagger_path, methods=['POST'])
+@jwt_required()
+def import_videos_from_excel():
+    """Import Videos from Excel/CSV file"""
+    if 'file' not in request.files:
+        return jsonify({"error": "Missing file in request"}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "Empty file name"}), 400
+
+    try:
+        created_videos = video_service.import_videos_from_file(file)
+        return jsonify({
+            "message": f"Imported {len(created_videos)} videos successfully!",
+            "created_video_ids": created_videos
+        }), 201
+
+    except Exception as e:
+        return jsonify({"error": f"Failed to import videos: {str(e)}"}), 500
+
+
+@video_bp.route('/random', methods=['GET'])
+@swag_from(swagger_path, methods=['GET'])
+def get_random_videos():
+    """Get 10 random videos"""
+    videos = video_service.get_random_videos(limit=10)
+    return jsonify([video.to_dict() for video in videos]), 200
+
+
+@video_bp.route('/most-liked', methods=['GET'])
+@swag_from(swagger_path, methods=['GET'])
+def get_most_liked_videos():
+    """Get 10 videos with most likes"""
+    videos_with_likes = video_service.get_most_liked_videos(limit=10)
+    result = []
+    for video, likes_count in videos_with_likes:
+        data = video.to_dict()
+        data['likes'] = likes_count
+        result.append(data)
+    return jsonify(result), 200
+
+
+@video_bp.route('/most-recent', methods=['GET'])
+@swag_from(swagger_path, methods=['GET'])
+def get_most_recent_videos():
+    """Get 10 most recent videos"""
+    videos = video_service.get_most_recent_videos(limit=10)
+    return jsonify([video.to_dict() for video in videos]), 200

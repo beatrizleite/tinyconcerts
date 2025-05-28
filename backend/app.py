@@ -17,6 +17,7 @@ def create_app(test_config=None):
     swagger_path = os.path.join(basedir, 'swagger', 'api_docs.yaml')
     Swagger(app, template_file=swagger_path)
 
+    # add this to origins to test locally: ["http://localhost:5173", "http://127.0.0.1:5173"]
     CORS(app, resources={r"/api/*": {"origins": "*"}},
          supports_credentials=True)
 
@@ -78,5 +79,6 @@ if __name__ == '__main__':
         debug=True,
         host=config.FLASK_RUN_HOST,
         port=int(config.FLASK_RUN_PORT),
+        # comment ssl_context to make sure it works locally
         ssl_context=('cert.pem', 'key.pem')
     )

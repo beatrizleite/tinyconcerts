@@ -1,4 +1,6 @@
 from models.video import Video
+from models.like import Like
+from sqlalchemy.sql import func
 
 
 class VideoRepo:
@@ -27,3 +29,22 @@ class VideoRepo:
         return self.db.query(Video).filter(
             Video.title.ilike(f'%{keyword}%')
         ).all()
+
+    def get_random_videos(self, limit=10):
+        return self.db.query(Video).order_by(func.random()).limit(limit).all()
+
+    def get_most_liked_videos(self, limit=10):
+        return (
+            self.db.query(
+                Video,
+                func.count(Like.id).label('likes_count')
+            )
+            .join(Like, (Like.video_id == Video.id) & (Like.like == True), isouter=True)
+            .group_by(Video.id)
+            .order_by(func.count(Like.id).desc())
+            .limit(limit)
+            .all()
+        )
+
+    def get_most_recent_videos(self, limit=10):
+        return self.db.query(Video).order_by(Video.published_at.desc()).limit(limit).all()

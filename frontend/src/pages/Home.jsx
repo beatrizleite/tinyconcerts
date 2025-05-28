@@ -1,41 +1,64 @@
-import React from 'react';
-import VideoSlider from '../components/VideoSlider'
+import React, { useEffect, useState } from 'react';
+import VideoSlider from '../components/VideoSlider';
+import { getRandomVideos, getMostLikedVideos, getMostRecentVideos } from '../api';
 
 export default function Home() {
-  const sampleVideos = Array.from({ length: 25 }, (_, i) => ({
-    id: i + 1,
-    title: `Sample Video ${i + 1} - This is a longer title to test text wrapping`,
-    thumbnail: `https://picsum.photos/192/108?random=${i + 1}`,
-    duration: `${Math.floor(Math.random() * 20 + 5)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
-    views: `${(Math.random() * 10).toFixed(1)}M`,
-    uploadTime: `${Math.floor(Math.random() * 30 + 1)} days ago`
-  }));
+  const [randomVideos, setRandomVideos] = useState([]);
+  const [mostLikedVideos, setMostLikedVideos] = useState([]);
+  const [mostRecentVideos, setMostRecentVideos] = useState([]);
+
+  const mapBackendVideoToFrontend = (video) => ({
+    id: video.id,
+    thumbnail: video.image_320_180,
+    title: video.title,
+    duration: video.duration || '0:00',
+    views: video.views || 0,
+    uploadTime: video.published_at,
+  });
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const [random, liked, recent] = await Promise.all([
+          getRandomVideos(),
+          getMostLikedVideos(),
+          getMostRecentVideos()
+        ]);
+        setRandomVideos(random.map(mapBackendVideoToFrontend));
+        setMostLikedVideos(liked.map(mapBackendVideoToFrontend));
+        setMostRecentVideos(recent.map(mapBackendVideoToFrontend));
+      } catch (error) {
+        console.error('Failed to fetch videos:', error);
+      }
+    };
+
+    fetchVideos();
+  }, []);
 
   const handleVideoClick = (video) => {
     console.log('Video clicked:', video);
-    // Add your navigation logic here, e.g.:
-    // router.push(`/video/${video.id}`);
+    // will route to video/{id}
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
-        <VideoSlider 
-          videos={sampleVideos}
-          title="Featured Videos"
-          onVideoClick={handleVideoClick}
-        />
-        
-        <VideoSlider 
-          videos={sampleVideos}
-          title="Trending Now"
-          onVideoClick={handleVideoClick}
-        />
-        
-        <VideoSlider 
-          videos={sampleVideos}
-          title="Recently Added"
-          onVideoClick={handleVideoClick}
-        />
-     </div>
+      <VideoSlider 
+        videos={randomVideos}
+        title="Featured Videos"
+        onVideoClick={handleVideoClick}
+      />
+      
+      <VideoSlider 
+        videos={mostLikedVideos}
+        title="Trending Now"
+        onVideoClick={handleVideoClick}
+      />
+      
+      <VideoSlider 
+        videos={mostRecentVideos}
+        title="Recently Added"
+        onVideoClick={handleVideoClick}
+      />
+    </div>
   );
 }
