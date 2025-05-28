@@ -11,7 +11,7 @@ import { useState } from 'react'
 
 function App() {
   
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn] = useState(true);
 
   return (
     <Router>
