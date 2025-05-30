@@ -31,38 +31,38 @@ def create_app(test_config=None):
     CORS(app, resources={r"/api/*": {"origins": cors_origins}},
          supports_credentials=True)
 
+    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_ENV", "secretkey")
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 900
+    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = 86400
+    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+
+    jwt = JWTManager(app)
+
+    @jwt.token_in_blocklist_loader
+    def check_if_token_revoked(jwt_header, jwt_payload):
+        return is_token_revoked(jwt_payload)
+
+    @jwt.revoked_token_loader
+    def revoked_token_response(jwt_header, jwt_payload):
+        logging.error("Token was revoked!")
+        return jsonify({"msg": "Token has been revoked"}), 401
+
+    @jwt.invalid_token_loader
+    def invalid_token_response(err_msg):
+        logging.error(f"Invalid token error: {err_msg}")
+        return jsonify({"msg": "Token is invalid"}), 401
+
+    @jwt.expired_token_loader
+    def expired_token_response(jwt_header, jwt_payload):
+        logging.error("Expired token!")
+        return jsonify({"msg": "Token has expired"}), 401
+
+    @jwt.unauthorized_loader
+    def missing_token_response(err_msg):
+        logging.error(f"Missing token error: {err_msg}")
+        return jsonify({"msg": "Missing token"}), 401
+
     if test_config is None:
-        app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_ENV", "secretkey")
-        app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 900
-        app.config["JWT_REFRESH_TOKEN_EXPIRES"] = 86400
-        app.config["JWT_TOKEN_LOCATION"] = ["headers"]
-
-        jwt = JWTManager(app)
-
-        @jwt.token_in_blocklist_loader
-        def check_if_token_revoked(jwt_header, jwt_payload):
-            return is_token_revoked(jwt_payload)
-
-        @jwt.revoked_token_loader
-        def revoked_token_response(jwt_header, jwt_payload):
-            logging.error("Token was revoked!")
-            return jsonify({"msg": "Token has been revoked"}), 401
-
-        @jwt.invalid_token_loader
-        def invalid_token_response(err_msg):
-            logging.error(f"Invalid token error: {err_msg}")
-            return jsonify({"msg": "Token is invalid"}), 401
-
-        @jwt.expired_token_loader
-        def expired_token_response(jwt_header, jwt_payload):
-            logging.error("Expired token!")
-            return jsonify({"msg": "Token has expired"}), 401
-
-        @jwt.unauthorized_loader
-        def missing_token_response(err_msg):
-            logging.error(f"Missing token error: {err_msg}")
-            return jsonify({"msg": "Missing token"}), 401
-
         database_url = os.getenv('DATABASE_URL') or getattr(config,
                                                             'DATABASE_URL',
                                                             None)
