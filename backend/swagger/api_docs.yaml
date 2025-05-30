@@ -332,7 +332,7 @@ paths:
           description: Unauthorized.
       summary: Update like status for a video
       tags:
-      - like
+      - Like
   /api/like/user:
     get:
       description: Retrieve a list of likes by the authenticated user.
@@ -344,7 +344,7 @@ paths:
           description: Unauthorized.
       summary: Get likes by the authenticated user
       tags:
-      - like
+      - Like
   /api/like/video:
     get:
       description: Retrieve a list of likes for a specific video.
@@ -362,7 +362,7 @@ paths:
           description: Invalid video ID.
       summary: Get likes for a specific video
       tags:
-      - like
+      - Like
   /api/like/user:
     get:
       responses:
@@ -396,145 +396,270 @@ paths:
       tags:
       - Like
   /api/playlist:
-    delete:
-      parameters:
-      - example: '123'
-        in: query
-        name: playlist_id
-        required: true
-        schema:
-          type: number
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-        '500':
-          description: Internal Server Error
-      summary: Delete Playlist
-      tags:
-      - Playlist
-    get:
-      parameters:
-      - example: '123'
-        in: query
-        name: playlist_id
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-        '500':
-          description: Internal Server Error
-      summary: Get Playlist by Id
-      tags:
-      - Playlist
     post:
+      tags:
+        - Playlist
+      security:
+        - bearerAuth: []
       requestBody:
+        required: true
         content:
           application/json:
-            example:
-              name: My Rock Playlist
-              user_id: user_id
+            schema:
+              type: object
+              required:
+                - user_id
+                - name
+              properties:
+                user_id:
+                  type: integer
+                  example: 1
+                name:
+                  type: string
+                  example: My Playlist
+      responses:
+        '201':
+          description: Playlist created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 123
+                  user_id:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: My Playlist
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Missing JSON body
+    get:
+      tags:
+        - Playlist
+      parameters:
+        - name: playlist_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: ID of the playlist
       responses:
         '200':
-          description: Success
+          description: Playlist found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 123
+                  user_id:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: My Playlist
         '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
+          description: Missing playlist_id
         '404':
-          description: Not Found
-        '500':
-          description: Internal Server Error
-      summary: Create Playlist
-      tags:
-      - Playlist
+          description: Playlist not found
     put:
+      tags:
+        - Playlist
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: playlist_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Playlist ID to update
       requestBody:
+        required: true
         content:
           application/json:
-            example:
-              name: My Rock Playlist
-              playlist_id: playlist_id
-              user_id: user_id
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Updated Playlist Name
       responses:
         '200':
-          description: Success
+          description: Playlist updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 123
+                  user_id:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: Updated Playlist Name
         '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
+          description: Missing playlist_id or JSON body
         '404':
-          description: Not Found
-        '500':
-          description: Internal Server Error
-      summary: Update Playlist
+          description: Playlist not found
+    delete:
       tags:
-      - Playlist
+        - Playlist
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: playlist_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Playlist ID to delete
+      responses:
+        '200':
+          description: Playlist deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Playlist deleted
+        '400':
+          description: Missing playlist_id
+        '404':
+          description: Playlist not found
   /api/playlist/user:
     get:
+      summary: Get all playlists by user
+      tags:
+        - Playlist
       parameters:
-      - example: '123'
-        in: query
-        name: user_id
-        required: true
-        schema:
-          type: string
+        - in: query
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: User ID to get playlists for
       responses:
         '200':
-          description: Success
+          description: List of playlists returned
+          content:
+            application/json:
+              schema:
+                type: array
         '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-        '500':
-          description: Internal Server Error
-      summary: Get Playlists By User
+          description: Missing user_id
+  /api/playlist/video/add:
+    post:
       tags:
-      - Playlist
-  /api/playlist/video:
+        - PlaylistVideo
+      summary: Add a video to a playlist
+      description: Adds a video to the specified playlist
+      requestBody:
+        description: Playlist and Video IDs
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - playlist_id
+                - video_id
+              properties:
+                playlist_id:
+                  type: integer
+                  example: 123
+                video_id:
+                  type: integer
+                  example: 456
+      responses:
+        '201':
+          description: Video added to playlist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Video added to playlist
+                  entry:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      playlist_id:
+                        type: integer
+                        example: 123
+                      video_id:
+                        type: integer
+                        example: 456
+        '400':
+          description: Missing playlist_id or video_id or invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Missing playlist_id or video_id
+  /api/playlist/video/remove:
     delete:
+      tags:
+        - PlaylistVideo
       parameters:
-      - example: '123'
-        in: query
-        name: video_id
-        required: true
-        schema:
-          type: number
-      - example: '123'
-        in: query
-        name: playlist_id
-        required: true
-        schema:
-          type: number
+        - name: playlist_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Playlist ID
+        - name: video_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Video ID
       responses:
         '200':
-          description: Success
+          description: Video removed from playlist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Video removed from playlist
         '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-        '500':
-          description: Internal Server Error
-      summary: Delete Video From Playlist
-      tags:
-      - Playlist
+          description: Missing playlist_id or video_id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Missing playlist_id or video_id
   /api/rating:
     get:
       parameters:

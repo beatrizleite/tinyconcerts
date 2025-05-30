@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, Text, Float
+from sqlalchemy import Column, Integer, String, Text
 from sqlalchemy.orm import relationship
 from models.base import Base
+
 
 class Video(Base):
     __tablename__ = 'videos'
@@ -14,6 +15,13 @@ class Video(Base):
     owner = Column(String(100))
     owner_url = Column(String(100))
     image_320_180 = Column(String(100))
+
+    comments = relationship('Comment', back_populates='video',
+                            cascade='all, delete-orphan')
+    likes = relationship('Like', back_populates='video',
+                         cascade='all, delete-orphan')
+    playlist_videos = relationship('PlaylistVideo', back_populates='video',
+                                   cascade='all, delete-orphan')
 
     def to_dict(self):
         return {
