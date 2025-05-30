@@ -13,11 +13,12 @@ def user_service(test_db_session):
 def test_create_user(client, user_service, access_token):
     payload = {
         "birthday": "1990-01-01",
-        "email": "test@example.com",
-        "fname": "Test",
-        "lname": "User",
+        "email": "test2@example.com",
+        "fname": "Test2",
+        "lname": "User2",
         "password": "secret123",
-        "username": "testuser"
+        "username": "testuser2",
+        "role": 0
     }
     response = client.post('/api/user', json=payload, headers={
         "Authorization": access_token
