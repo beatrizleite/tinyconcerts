@@ -3,9 +3,11 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from app import create_app
-from database import Base, db_session
+from database import Base
+from flask_jwt_extended import create_access_token
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "sqlite:///:memory:")
+
 
 @pytest.fixture(scope='session')
 def engine():
@@ -15,9 +17,11 @@ def engine():
     Base.metadata.drop_all(bind=engine)
     engine.dispose()
 
+
 @pytest.fixture(scope='session')
 def session_factory(engine):
     return sessionmaker(bind=engine)
+
 
 @pytest.fixture(scope='function')
 def test_db_session(session_factory):
@@ -37,6 +41,14 @@ def app(test_db_session):
     }
     app = create_app(test_config)
     yield app
+
+
+@pytest.fixture(scope='function')
+def access_token(app):
+    with app.app_context():
+        token = create_access_token(identity="testuser")
+    return f"Bearer {token}"
+
 
 @pytest.fixture(scope='function')
 def client(app):
