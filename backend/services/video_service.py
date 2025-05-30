@@ -55,8 +55,13 @@ class VideoService:
             raise NotFoundError(f"Video with id {video_id} not found.")
         self.repo.delete(video)
 
-    def search_video(self, keyword: str, limit: int = 20) -> List[Video]:
-        return self.repo.search_by_title(keyword, limit=limit)
+    def search_videos(self, keyword, page, per_page):
+        query = self.db_session.query(Video).filter(
+            Video.title.ilike(f'%{keyword}%') | Video.description.ilike(f'%{keyword}%')
+        )
+        total = query.count()
+        videos = query.offset((page - 1) * per_page).limit(per_page).all()
+        return videos, total
 
     def report_video(self, video_id: int, report_data: dict) -> bool:
         logger.info(f"Video {video_id} reported with data: {report_data}")
@@ -132,3 +137,9 @@ class VideoService:
         for field in fields:
             if field in data:
                 setattr(obj, field, data[field])
+
+    def get_all_videos(self, page, per_page):
+        query = self.db_session.query(Video)
+        total = query.count()
+        videos = query.offset((page - 1) * per_page).limit(per_page).all()
+        return videos, total

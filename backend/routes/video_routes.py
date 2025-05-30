@@ -90,14 +90,16 @@ def delete_video():
 
 @video_bp.route('/search', methods=['GET'])
 @swag_from(swagger_path, methods=['GET'])
-@jwt_required()
-def search_videos():
-    """Search Videos"""
+def search_videos_paginated():
     keyword = request.args.get('q')
     if not keyword:
         return jsonify({"error": "Missing search keyword parameter 'q'"}), 400
 
-    results = video_service.search_videos(keyword)
+    page = request.args.get('page', default=1, type=int)
+    per_page = request.args.get('per_page', default=10, type=int)
+
+    videos, total = video_service.search_videos(keyword, page, per_page)
+
     videos_list = [{
         "id": v.id,
         "title": v.title,
@@ -108,8 +110,14 @@ def search_videos():
         "owner": v.owner,
         "owner_url": v.owner_url,
         "image_320_180": v.image_320_180
-    } for v in results]
-    return jsonify({"results": videos_list}), 200
+    } for v in videos]
+
+    return jsonify({
+        "results": videos_list,
+        "total": total,
+        "page": page,
+        "per_page": per_page
+    }), 200
 
 
 @video_bp.route('/report', methods=['POST'])
@@ -182,3 +190,31 @@ def get_most_recent_videos():
     """Get 10 most recent videos"""
     videos = video_service.get_most_recent_videos(limit=10)
     return jsonify([video.to_dict() for video in videos]), 200
+
+
+@video_bp.route('/all', methods=['GET'])
+@swag_from(swagger_path, methods=['GET'])
+def get_all_videos():
+    page = request.args.get('page', default=1, type=int)
+    per_page = request.args.get('per_page', default=10, type=int)
+
+    videos, total = video_service.get_all_videos(page, per_page)
+
+    videos_list = [{
+        "id": v.id,
+        "title": v.title,
+        "description": v.description,
+        "video_link": v.video_link,
+        "category": v.category,
+        "published_at": v.published_at,
+        "owner": v.owner,
+        "owner_url": v.owner_url,
+        "image_320_180": v.image_320_180
+    } for v in videos]
+
+    return jsonify({
+        "results": videos_list,
+        "total": total,
+        "page": page,
+        "per_page": per_page
+    }), 200
