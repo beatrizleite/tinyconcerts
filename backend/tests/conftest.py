@@ -7,6 +7,7 @@ from database import Base, db_session
 from flask_jwt_extended import create_access_token
 from models.user import User  # adjust import path to your User model
 from werkzeug.security import generate_password_hash
+from datetime import date
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "sqlite:///:memory:")
 
@@ -52,7 +53,7 @@ def test_user(test_db_session):
         email="test@example.com",
         fname="Test",
         lname="User",
-        birthday="1990-01-01",
+        birthday=date(1990, 1, 1),
         password_hash=generate_password_hash("secret123"),
         role=1
     )
