@@ -27,6 +27,7 @@ class LikeRepo:
         return like
 
     def update(self, like: Like):
+        self.db.add(like)
         self.db.commit()
         return like
 
