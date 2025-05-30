@@ -25,7 +25,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/user?user_id=${userId}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user?user_id=${userId}`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -71,7 +71,7 @@ export default function Profile() {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/user", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
