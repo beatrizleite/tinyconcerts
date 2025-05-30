@@ -8,7 +8,7 @@ const VideoCard = ({ video, onClick, isDragging }) => {
     <div 
       className="flex-shrink-0 w-96 cursor-pointer group"
       style={{ cursor: isDragging ? 'grabbing' : 'pointer' }}
-      onClick={() => onClick && onClick(video)}
+  onClick={() => onClick(video)}
     >
       <div className="relative mb-2 rounded-lg overflow-hidden">
         <img 
