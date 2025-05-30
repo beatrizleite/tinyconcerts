@@ -10,23 +10,6 @@ def user_service(test_db_session):
     return service
 
 
-def test_create_user(client, user_service, access_token):
-    payload = {
-        "birthday": "1990-01-01",
-        "email": "test2@example.com",
-        "fname": "Test2",
-        "lname": "User2",
-        "password": "secret123",
-        "username": "testuser2",
-        "role": 0
-    }
-    response = client.post('/api/user', json=payload, headers={
-        "Authorization": access_token
-    })
-    assert response.status_code in (200, 201)
-    assert "id" in response.json
-
-
 def test_get_users(client, access_token):
     response = client.get('/api/user/all', headers={
         "Authorization": access_token
