@@ -37,22 +37,12 @@ def get_video_by_id():
     if not video_id or not video_id.isdigit():
         return jsonify({"error": "Missing or invalid video_id"}), 400
 
-    video = video_service.get_video_by_id(int(video_id))
-    if not video:
-        return jsonify({"message": "Video not found"}), 404
+    try:
+        video = video_service.get_video_by_id(int(video_id))
+    except FileNotFoundError:
+        return jsonify({"message": "Video not foud"}), 404
 
-    video_data = {
-        "id": video.id,
-        "title": video.title,
-        "description": video.description,
-        "video_link": video.video_link,
-        "category": video.category,
-        "published_at": video.published_at,
-        "owner": video.owner,
-        "owner_url": video.owner_url,
-        "image_320_180": video.image_320_180
-    }
-    return jsonify(video_data), 200
+    return jsonify(video), 200
 
 
 @video_bp.route('', methods=['PUT'])

@@ -2,6 +2,7 @@ import logging
 from typing import List
 from models.video import Video
 from repositories.video_repo import VideoRepo
+from services.like_service import LikeService
 import pandas as pd
 
 logger = logging.getLogger(__name__)
@@ -12,8 +13,9 @@ class NotFoundError(Exception):
 
 
 class VideoService:
-    def __init__(self, db_session):
+    def __init__(self, db_session, like_service=None):
         self.repo = VideoRepo(db_session)
+        self.like_service = like_service or LikeService(db_session)
 
     def create_video(self, data: dict) -> Video:
         required_fields = ['title', 'video_link', 'image_320_180']
@@ -33,11 +35,17 @@ class VideoService:
         )
         return self.repo.add(video)
 
-    def get_video_by_id(self, video_id: int) -> Video:
+    def get_video_by_id(self, video_id: int) -> dict:
         video = self.repo.get_by_id(video_id)
         if not video:
             raise NotFoundError(f"Video with id {video_id} not found.")
-        return video
+
+        video_data = video.to_dict()
+
+        like_count = self.like_service.get_likes_by_video(video_id)
+        video_data['like_count'] = like_count
+
+        return video_data
 
     def update_video(self, video_id: int, data: dict) -> Video:
         video = self.repo.get_by_id(video_id)
@@ -57,7 +65,8 @@ class VideoService:
 
     def search_videos(self, keyword, page, per_page):
         query = self.db_session.query(Video).filter(
-            Video.title.ilike(f'%{keyword}%') | Video.description.ilike(f'%{keyword}%')
+            Video.title.ilike(f'%{keyword}%') | Video.description.ilike(
+                f'%{keyword}%')
         )
         total = query.count()
         videos = query.offset((page - 1) * per_page).limit(per_page).all()
