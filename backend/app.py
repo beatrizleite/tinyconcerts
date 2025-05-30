@@ -13,12 +13,22 @@ from utils.token_blacklist import is_token_revoked
 def create_app(test_config=None):
     app = Flask(__name__)
 
+    # Setup logging globally
+    logging.basicConfig(level=logging.INFO,
+                        format="%(asctime)s [%(levelname)s] %(message)s")
+
     basedir = os.path.abspath(os.path.dirname(__file__))
     swagger_path = os.path.join(basedir, 'swagger', 'api_docs.yaml')
+
+    if not os.path.exists(swagger_path):
+        logging.error(f"Swagger file not found at {swagger_path}")
+        raise FileNotFoundError(f"Swagger file not found at {swagger_path}")
+
     Swagger(app, template_file=swagger_path)
 
-    # add this to origins to test locally: ["http://localhost:5173", "http://127.0.0.1:5173"]
-    CORS(app, resources={r"/api/*": {"origins": "*"}},
+    # CORS origins (can be configured via env var)
+    cors_origins = os.getenv("CORS_ORIGINS", "*").split(",")
+    CORS(app, resources={r"/api/*": {"origins": cors_origins}},
          supports_credentials=True)
 
     if test_config is None:
@@ -55,8 +65,7 @@ def create_app(test_config=None):
 
         database_url = os.getenv('DATABASE_URL') or getattr(config,
                                                             'DATABASE_URL',
-                                                            None
-                                                            )
+                                                            None)
         if not database_url:
             raise ValueError("DATABASE_URL is not set!")
         init_db(database_url)
@@ -70,15 +79,33 @@ def create_app(test_config=None):
     def home():
         return "This is the API. swagger at /apidocs"
 
+    # Global error handlers
+    @app.errorhandler(404)
+    def not_found(e):
+        return jsonify({"msg": "Not found"}), 404
+
+    @app.errorhandler(500)
+    def server_error(e):
+        logging.exception("Server error!")
+        return jsonify({"msg": "Internal server error"}), 500
+
     return app
 
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(
-        debug=True,
-        host=config.FLASK_RUN_HOST,
-        port=int(config.FLASK_RUN_PORT),
-        # comment ssl_context to make sure it works locally
-        ssl_context=('cert.pem', 'key.pem')
-    )
+    flask_env = os.getenv("FLASK_ENV", "development").lower()
+
+    if flask_env == "production":
+        app.run(
+            debug=False,
+            host=config.FLASK_RUN_HOST,
+            port=int(config.FLASK_RUN_PORT),
+            ssl_context=('cert.pem', 'key.pem')
+        )
+    else:
+        app.run(
+            debug=True,
+            host=config.FLASK_RUN_HOST,
+            port=int(config.FLASK_RUN_PORT)
+        )
