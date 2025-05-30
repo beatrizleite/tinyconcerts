@@ -1,6 +1,6 @@
 from models.user import User
 from repositories.user_repo import UserRepo
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 
@@ -42,3 +42,9 @@ class UserService:
             return False
         self.repo.delete(user)
         return True
+
+    def verifyUser(self, username, password):
+        user = self.repo.getByUsername(username)
+        if user and check_password_hash(user.password_hash, password):
+            return user
+        return None

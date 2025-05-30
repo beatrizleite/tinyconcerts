@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, Text,
 from sqlalchemy.orm import relationship
 from models.base import Base
 
+
 class PlaylistVideo(Base):
     __tablename__ = 'playlist_video'
 

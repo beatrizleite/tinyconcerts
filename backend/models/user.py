@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, Text,
 from sqlalchemy.orm import relationship
 from models.base import Base
 
+
 class User(Base):
     __tablename__ = 'users'
 
@@ -12,3 +13,4 @@ class User(Base):
     email = Column(String(100), unique=True, nullable=False)
     birthday = Column(Date)
     password_hash = Column(String(255), nullable=False)
+    role = Column(Integer, nullable=False, default=0)

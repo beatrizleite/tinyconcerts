@@ -1,11 +1,14 @@
 from flask import Blueprint, request, jsonify
 from flasgger import swag_from
+import os
 
 comment_bp = Blueprint('comment_bp', __name__, url_prefix='/api/comment')
+swagger_path = os.path.normpath(os.path.join(os.path.dirname(__file__),
+                                             '..', 'swagger', 'api_docs.yaml'))
 
 
 @comment_bp.route('', methods=['PUT'])
-@swag_from('../swagger/api_docs.yaml', methods=['PUT'])
+@swag_from(swagger_path, methods=['PUT'])
 def update_comment():
     """Update Comment"""
     data = request.get_json()
@@ -15,7 +18,7 @@ def update_comment():
 
 
 @comment_bp.route('', methods=['GET'])
-@swag_from('../swagger/api_docs.yaml', methods=['GET'])
+@swag_from(swagger_path, methods=['GET'])
 def get_comments_by_id():
     """Get Comments By Id"""
     comment_id = request.args.get('comment_id')
@@ -23,14 +26,14 @@ def get_comments_by_id():
 
 
 @comment_bp.route('', methods=['DELETE'])
-@swag_from('../swagger/api_docs.yaml', methods=['DELETE'])
+@swag_from(swagger_path, methods=['DELETE'])
 def delete_comment():
     """Delete Comment"""
     return jsonify({"message": "Not implemented yet"}), 501
 
 
 @comment_bp.route('/video', methods=['GET'])
-@swag_from('../swagger/api_docs.yaml', methods=['GET'])
+@swag_from(swagger_path, methods=['GET'])
 def get_comments_per_video():
     """Get Comments Per Video"""
     video_id = request.args.get('video_id')
@@ -38,7 +41,7 @@ def get_comments_per_video():
 
 
 @comment_bp.route('/user', methods=['GET'])
-@swag_from('../swagger/api_docs.yaml', methods=['GET'])
+@swag_from(swagger_path, methods=['GET'])
 def get_comments_per_user():
     """Get Comments Per User"""
     user_id = request.args.get('user_id')
@@ -46,7 +49,7 @@ def get_comments_per_user():
 
 
 @comment_bp.route('/report', methods=['POST'])
-@swag_from('../swagger/api_docs.yaml', methods=['POST'])
+@swag_from(swagger_path, methods=['POST'])
 def report_comment():
     """Report Comment"""
     data = request.get_json()

@@ -7,55 +7,61 @@ info:
 basePath: /
 schemes:
   - https
+  - http
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: >
+      Enter your JWT token like this: Bearer <token>
+security:
+  - Bearer: []
 paths:
-  /api/auth/logout:
-    post:
-      summary: Logout
-      tags:
-        - Authentication
-      requestBody:
-        content:
-          application/json:
-            example:
-              token: token
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-        '500':
-          description: Internal Server Error
   /api/auth/login:
     post:
       summary: Login
       tags:
         - Authentication
-      requestBody:
-        content:
-          application/json:
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: credentials
+          required: true
+          schema:
+            type: object
+            required:
+              - username
+              - password
+            properties:
+              username:
+                type: string
+              password:
+                type: string
             example:
-              username: username
-              password: password
+              username: johndoe
+              password: secret123
       responses:
         '200':
-          description: Success
+          description: Login successful
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
         '400':
-          description: Bad Request
+          description: Missing or invalid input
         '403':
-          description: Forbidden
-        '404':
-          description: Not Found
+          description: Forbidden - invalid credentials
         '500':
-          description: Internal Server Error
-  /api/user:
+          description: Internal server error
+
+  /api/auth/register:
     post:
-      summary: Create User
+      summary: Register a new user
       tags:
-        - User
+        - Authentication
       consumes:
         - application/json
       parameters:
@@ -80,6 +86,7 @@ paths:
                 type: string
               email:
                 type: string
+                format: email
               birthday:
                 type: string
                 format: date
@@ -104,6 +111,89 @@ paths:
                 type: string
         '400':
           description: Missing or invalid input
+        '409':
+          description: Conflict - username or email already exists
+        '500':
+          description: Internal server error
+
+  /api/auth/logout:
+    post:
+      summary: Logout
+      tags:
+        - Authentication
+      responses:
+        '200':
+          description: Logout successful
+        '400':
+          description: Missing or invalid input
+        '403':
+          description: Forbidden - invalid token
+        '500':
+          description: Internal server error
+
+  /api/user:
+    post:
+      summary: Create User (Admin only)
+      tags:
+        - User
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: user
+          required: true
+          schema:
+            type: object
+            required:
+              - fname
+              - lname
+              - username
+              - email
+              - birthday
+              - password
+              - role
+            properties:
+              fname:
+                type: string
+              lname:
+                type: string
+              username:
+                type: string
+              email:
+                type: string
+                format: email
+              birthday:
+                type: string
+                format: date
+              password:
+                type: string
+              role:
+                type: integer
+                description: User role (e.g., 0 = normal user, 1 = admin)
+            example:
+              fname: Jane
+              lname: Smith
+              username: janesmith
+              email: jane@example.com
+              birthday: 1988-07-15
+              password: adminpass
+              role: 1
+      responses:
+        '201':
+          description: User created successfully
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+              username:
+                type: string
+              role:
+                type: integer
+        '400':
+          description: Missing or invalid input
+        '409':
+          description: Conflict - username or email already exists
         '500':
           description: Internal server error
 
