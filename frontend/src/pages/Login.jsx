@@ -16,7 +16,7 @@ export default function Login() {
         setError("");
 
         try {
-            const res = await fetch("http://localhost:5000/api/auth/login", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form),
@@ -38,16 +38,16 @@ export default function Login() {
     return (
         <div className="min-h-screen bg-gray-800 py-6 flex flex-col justify-center sm:py-12">
             <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-700 to-purple-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl" />
-                <div className="relative px-4 py-10 bg-indigo-400 shadow-lg sm:rounded-3xl sm:p-20 text-white">
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-700 to-red-900 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl" />
+                <div className="relative px-4 py-10 bg-gray-600 shadow-lg sm:rounded-3xl sm:p-20 text-white">
                     <div className="text-center pb-6">
                         <h1 className="text-3xl">Login</h1>
-                        <p className="text-gray-100">Acede à tua conta</p>
+                        <p className="text-gray-100">Access your account</p>
                     </div>
 
                     <form onSubmit={handleSubmit}>
                         <input
-                            className="shadow mb-4 border rounded w-full py-2 px-3 text-gray-700"
+                            className="shadow mb-4 border border-white rounded w-full py-2 px-3 text-gray-200"
                             type="text"
                             name="username"
                             placeholder="Username"
@@ -55,7 +55,7 @@ export default function Login() {
                             onChange={handleChange}
                         />
                         <input
-                            className="shadow mb-4 border rounded w-full py-2 px-3 text-gray-700"
+                            className="shadow mb-4 border border-white rounded w-full py-2 px-3 text-gray-200"
                             type="password"
                             name="password"
                             placeholder="Password"
@@ -68,16 +68,16 @@ export default function Login() {
                         <div className="flex justify-between">
                             <button
                                 type="submit"
-                                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+                                className="!bg-black hover:!border-red-500 text-white font-bold py-2 px-4 rounded"
                             >
-                                Entrar
+                                Login
                             </button>
                             <button
                                 type="reset"
-                                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+                                className="!bg-black hover:!border-red-500 text-white font-bold py-2 px-4 rounded"
                                 onClick={() => setForm({ username: "", password: "" })}
                             >
-                                Limpar
+                                Clean
                             </button>
                         </div>
                     </form>

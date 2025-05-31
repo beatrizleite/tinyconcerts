@@ -128,12 +128,24 @@ useEffect(() => {
                                         Profile
                                     </Link>
                                 </li>
-                                <li className='p-2 hover:bg-red-500 rounded-md cursor-pointer'>Logout</li>
+                                <li>
+                                    <Link className='block p-2 !text-white hover:bg-red-500 rounded-md cursor-pointer' to='/logout'>
+                                        Logout
+                                    </Link>
+                                </li>
                             </>
                         ) : (
                             <>
-                                <li className='p-2 hover:bg-red-500 rounded-md cursor-pointer'>Login</li>
-                                <li className='p-2 hover:bg-red-500 rounded-md cursor-pointer'>Sign Up</li>
+                                <li> 
+                                    <Link to='/login' className='block p-2 !text-white hover:bg-red-500 rounded-md cursor-pointer'>
+                                        Login
+                                    </Link>
+                                </li>
+                                <li> 
+                                    <Link to='/register' className=' block p-2 !text-white hover:bg-red-500 rounded-md cursor-pointer'>
+                                        Sign Up
+                                    </Link>
+                                </li>
                             </>
                         )}
                     </ul>
