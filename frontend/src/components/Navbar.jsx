@@ -7,7 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import { useEffect } from 'react';
 
 
-export default function Navbar() {
+export default function Navbar({ onLoginClick, onRegisterClick }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isSubMenuOpen, setIsSubMenuOpen] = useState(false)
@@ -21,7 +21,7 @@ useEffect(() => {
   setIsDropdownOpen(false);
 }, [location.pathname]);
     return (
-<header className="relative z-50 flex justify-between items-center !text-white py-5 px-8 md:px-12 bg-gray-950 drop-shadow-md">
+        <header className="relative z-50 flex justify-between items-center !text-white py-5 px-8 md:px-12 bg-gray-950 drop-shadow-md">
             <Link to='/' className='!text-white hover:!text-white'>
                 <img src={logo} alt="Logo" className='h-10 hover:scale-105 transition-all' />
             </Link>
@@ -71,12 +71,12 @@ useEffect(() => {
                                     </>
                                 ) : (
                                     <>
-                                        <Link to='/login' className='block px-4 py-2 hover:bg-red-500 rounded-md cursor-pointer'>
+                                        <li onClick={onLoginClick} className='px-4 py-2 hover:bg-red-500 rounded-md cursor-pointer'>
                                             Login
-                                        </Link>
-                                        <Link to='/register' className='block px-4 py-2 hover:bg-red-500 rounded-md cursor-pointer'>
+                                        </li>
+                                        <li onClick={onRegisterClick} className='px-4 py-2 hover:bg-red-500 rounded-md cursor-pointer'>
                                             Sign Up
-                                        </Link>
+                                        </li>
 
                                     </>
                                 )}
@@ -136,15 +136,11 @@ useEffect(() => {
                             </>
                         ) : (
                             <>
-                                <li> 
-                                    <Link to='/login' className='block p-2 !text-white hover:bg-red-500 rounded-md cursor-pointer'>
-                                        Login
-                                    </Link>
+                                <li onClick={onLoginClick} className='px-4 py-2 hover:bg-red-500 rounded-md cursor-pointer'>
+                                    Login
                                 </li>
-                                <li> 
-                                    <Link to='/register' className=' block p-2 !text-white hover:bg-red-500 rounded-md cursor-pointer'>
-                                        Sign Up
-                                    </Link>
+                                <li onClick={onRegisterClick} className='px-4 py-2 hover:bg-red-500 rounded-md cursor-pointer'>
+                                    Sign Up
                                 </li>
                             </>
                         )}
