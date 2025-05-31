@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Edit2, Trash2 } from "lucide-react";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function CommentSection({ videoId }) {
   const { isAuthenticated, token, username } = useAuth();
@@ -72,7 +73,9 @@ export default function CommentSection({ videoId }) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to post comment');
+        const errorData = await response.json();
+        const errorMessage = errorData.msg || 'Failed to post comment. Please try again.';
+        throw new Error(errorMessage);
       }
 
       const newCommentData = await response.json();
@@ -86,42 +89,69 @@ export default function CommentSection({ videoId }) {
 
       setComments([commentWithUserData, ...comments]);
       setNewComment("");
+      toast.success('Comment posted!');
 
     } catch (err) {
-      console.error('Error posting comment:', err);
-      alert('Failed to post comment. Please try again.');
+      console.error('Error posting comment:', JSON.stringify(err));
+      toast.error('Failed to post comment. Please try again.');
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (commentId) => {
-    if (!confirm('Are you sure you want to delete this comment?')) {
-      return;
-    }
+    toast.info(
+      <div>
+        <p>Are you sure you want to delete this comment?</p>
+        <div className="mt-2 flex gap-2">
+          <button
+            onClick={async () => {
+              try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/comment?comment_id=${commentId}`, {
+                  method: 'DELETE',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify({
+                    id: commentId
+                  })
+                });
 
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/comment?comment_id=${commentId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          id: commentId
-        })
-      });
+                if (!response.ok) {
+                  const errorData = await response.json();
+                  const errorMessage = errorData.msg || 'Failed to delete comment. Please try again.';
+                  throw new Error(errorMessage);
+                }
 
-      if (!response.ok) {
-        throw new Error('Failed to delete comment');
+                setComments(comments.filter(comment => comment.id !== commentId));
+                toast.dismiss();
+                toast.success('Comment deleted!');
+              } catch (err) {
+                console.error('Error deleting comment:', err);
+                toast.dismiss();
+                toast.error('Failed to delete comment. Please try again.');
+              }
+            }}
+            className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => toast.dismiss()}
+            className="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700"
+          >
+            No
+          </button>
+        </div>
+      </div>,
+      {
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+        pauseOnHover: false
       }
-
-      setComments(comments.filter(comment => comment.id !== commentId));
-
-    } catch (err) {
-      console.error('Error deleting comment:', err);
-      alert('Failed to delete comment. Please try again.');
-    }
+    );
   };
 
   const handleEdit = (comment) => {
@@ -146,7 +176,9 @@ export default function CommentSection({ videoId }) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update comment');
+        const errorData = await response.json();
+        const errorMessage = errorData.msg || 'Failed to update comment. Please try again.';
+        throw new Error(errorMessage);
       }
 
       setComments(comments.map(comment =>
@@ -157,10 +189,11 @@ export default function CommentSection({ videoId }) {
 
       setEditingComment(null);
       setEditText("");
+      toast.success('Comment updated!');
 
     } catch (err) {
-      console.error('Error updating comment:', err);
-      alert('Failed to update comment. Please try again.');
+      console.error('Error updating comment:', err.message);
+      toast.error(err.message);
     }
   };
 
@@ -170,7 +203,6 @@ export default function CommentSection({ videoId }) {
   };
 
   const isUserComment = (comment) => {
-    console.log(username);
     return comment.username === username;
   };
 
@@ -293,6 +325,20 @@ export default function CommentSection({ videoId }) {
           )}
         </div>
       )}
+
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition={Bounce}
+      />
     </div>
   );
 }
