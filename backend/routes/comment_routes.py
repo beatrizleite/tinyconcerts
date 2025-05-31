@@ -81,15 +81,7 @@ def get_comments_per_video():
     if not video_id:
         return jsonify({"error": "Missing video_id"}), 400
 
-    comments = comment_service.get_comments_per_video(int(video_id))
-    result = [
-        {
-            "id": c.id,
-            "user_id": c.user_id,
-            "video_id": c.video_id,
-            "comment_text": c.comment_text
-        } for c in comments
-    ]
+    result = comment_service.get_comments_per_video(int(video_id))
     return jsonify(result)
 
 
@@ -141,9 +133,6 @@ def create_comment():
         data['user_id'] = user_id
 
         comment = comment_service.create_comment(data)
-        return jsonify({
-            "message": "Comment created",
-            "id": comment.id
-        }), 201
+        return jsonify(comment), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400

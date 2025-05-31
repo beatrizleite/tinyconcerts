@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Register({ onSuccess }) {
@@ -13,7 +12,6 @@ export default function Register({ onSuccess }) {
   });
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -35,7 +33,6 @@ export default function Register({ onSuccess }) {
       }
 
       await res.json();
-      navigate("/login");
       onSuccess?.();
     } catch (err) {
       setError(err.message);

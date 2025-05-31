@@ -25,7 +25,7 @@ export default function Login({ onSuccess }) {
       if (!res.ok) throw new Error("Credenciais inválidas");
       const data = await res.json();
       console.log("Token recebido do backend:", data.token);
-      login(data.access_token);
+      login(data.access_token, data.username);
       localStorage.setItem("user_id", data.id);
       localStorage.setItem("username", data.username);
       navigate("/");

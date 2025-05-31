@@ -12,7 +12,6 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isSubMenuOpen, setIsSubMenuOpen] = useState(false)
     const location = useLocation()
-    const isLoggedIn = false
     const { isAuthenticated, logout } = useAuth();
 
     const isActive = (path) => location.pathname === path
@@ -121,18 +120,16 @@ useEffect(() => {
                 </li>
                 {isSubMenuOpen && (
                     <ul className='w-full text-center bg-gray-800 rounded-md shadow-lg mt-1'>
-                        {isLoggedIn ? (
+                        {isAuthenticated ? (
                             <>
                                 <li>
                                     <Link to='/profile' className='block p-2 hover:bg-red-500 !text-white hover:!text-white rounded-md cursor-pointer'>
                                         Profile
                                     </Link>
                                 </li>
-                                <li>
-                                    <Link className='block p-2 !text-white hover:bg-red-500 rounded-md cursor-pointer' to='/logout'>
-                                        Logout
-                                    </Link>
-                                </li>
+                                <li onClick={logout} className="px-4 py-2 hover:bg-red-500 rounded-md cursor-pointer">
+                                            Logout
+                                        </li>
                             </>
                         ) : (
                             <>

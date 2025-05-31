@@ -1,5 +1,7 @@
 from models.comment import Comment
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
+
 
 class CommentRepo:
     def __init__(self, db_session: Session):
@@ -25,7 +27,7 @@ class CommentRepo:
         self.db.commit()
 
     def get_comments_by_video(self, video_id: int):
-        return self.db.query(Comment).filter(Comment.video_id == video_id).all()
+        return self.db.query(Comment).filter(Comment.video_id == video_id).order_by(desc(Comment.id)).all()
 
     def get_comments_by_user(self, user_id: int):
-        return self.db.query(Comment).filter(Comment.user_id == user_id).all()
+        return self.db.query(Comment).filter(Comment.user_id == user_id).order_by(desc(Comment.id)).all()
