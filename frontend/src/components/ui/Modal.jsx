@@ -15,7 +15,7 @@ export default function Modal({ isOpen, onClose, children }) {
 
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-300 hover:text-white"
+          className="absolute top-4 right-4 text-gray-300 hover:text-white cursor-pointer"
         >
           <X size={20} />
         </button>

@@ -1,5 +1,7 @@
-from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, Text, Float
+from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 from models.base import Base
+
 
 class Rating(Base):
     __tablename__ = 'ratings'
@@ -8,3 +10,6 @@ class Rating(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     video_id = Column(Integer, ForeignKey('videos.id'))
     rating = Column(Integer)
+
+    user = relationship('User', back_populates='ratings')
+    video = relationship('Video', back_populates='ratings')

@@ -21,3 +21,5 @@ class User(Base):
                          cascade='all, delete-orphan')
     playlists = relationship('Playlist', back_populates='user',
                              cascade='all, delete-orphan')
+    ratings = relationship('Rating', back_populates='user',
+                           cascade='all, delete-orphan')

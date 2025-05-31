@@ -8,7 +8,7 @@ import About from './pages/About';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Modal from './components/Modal'
+import Modal from './components/ui/Modal'
 import { useState } from 'react'
 import { AuthProvider } from './context/AuthContext';
 import VideoView from './pages/VideoView';

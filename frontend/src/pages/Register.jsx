@@ -170,7 +170,7 @@ export default function Register({ onSuccess }) {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 w-12 flex items-center justify-center
-                           text-gray-400 hover:text-white transition-colors duration-200"
+                           text-gray-400 hover:text-white transition-colors duration-200 cursor-pointer"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -191,7 +191,7 @@ export default function Register({ onSuccess }) {
                        text-white font-semibold py-3 px-4 rounded-lg 
                        transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg
                        focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-gray-900
-                       disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                       disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none cursor-pointer"
           >
             Create Account
           </button>
@@ -200,8 +200,8 @@ export default function Register({ onSuccess }) {
             type="button"
             className="w-full bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700/50 hover:border-gray-600
                        text-gray-300 hover:text-white font-medium py-3 px-4 rounded-lg 
-                       transition-all duration-200 transform hover:scale-[1.02]
-                       focus:outline-none focus:ring-2 focus:ring-gray-500/50 focus:ring-offset-2 focus:ring-offset-gray-900"
+                       transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 
+                       focus:ring-gray-500/50 focus:ring-offset-2 focus:ring-offset-gray-900 cursor-pointer"
             onClick={() =>
               setForm({
                 username: "",

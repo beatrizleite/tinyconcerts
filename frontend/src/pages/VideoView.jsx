@@ -2,12 +2,24 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import VideoPlayer from "../components/VideoPlayer";
 import CommentSection from "../components/CommentSection";
+import { ThumbsUp, Star, StarHalf } from "lucide-react"
+import { useAuth } from "../context/AuthContext";
+import { toast, ToastContainer, Bounce } from "react-toastify";
+import StarRating from "../components/ui/StarRating"
 
+  
 export default function VideoView() {
+  const { isAuthenticated, token } = useAuth();
   const { id } = useParams();
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [liked, setLiked] = useState(false)
+  const [likeCooldown, setLikeCooldown] = useState(false);
+
+  const [rating, setRating] = useState(0);
+  const [ratingCooldown, setRatingCooldown] = useState(false);
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -26,6 +38,9 @@ export default function VideoView() {
         
         const videoData = await response.json();
         setVideo(videoData);
+        if (videoData.rating) {
+          setRating(videoData.rating)
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -38,7 +53,71 @@ export default function VideoView() {
     }
   }, [id]);
 
-  // Format date for display
+  const handleLike = async () => {
+    if (!isAuthenticated) {
+      toast.warning("Please log in to like this video!")
+      return;
+    }
+    if (likeCooldown) return;
+    setLikeCooldown(true)
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          video_id: parseInt(id),
+          like_status: liked
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to like video");
+      
+      setLiked(!liked)
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setTimeout(() => setLikeCooldown(false), 1000);
+    }
+  }
+
+  const handleRating = async (newRating) => {
+    if (!isAuthenticated) {
+      toast.warning("Please log in to rate this video!");
+      return;
+    }
+    if (ratingCooldown) return;
+    setRatingCooldown(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/rating`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          video_id: id,
+          rating: newRating,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to rate video");
+
+      setRating(newRating);
+      toast.success(`You rated this video ${newRating} stars!`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to submit rating");
+    } finally {
+      setTimeout(() => setRatingCooldown(false), 1000);
+    }
+  };
+
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-PT');
@@ -115,25 +194,31 @@ export default function VideoView() {
           </div>
 
           <VideoPlayer url={video.video_link} />
-
+          
+          <div className="flex gap-4 mt-4 items-center">
+            <button 
+              onClick={handleLike}
+              disabled={likeCooldown}
+              className="flex flex-col items-center justify-center gap-1 cursor-pointer">
+              <ThumbsUp fill={liked ? "#2e9aff" : "none"} /> Like
+            </button>
+            <div className="flex flex-col items-center gap-1">
+              <div className="flex flex-col items-center justify-center gap-1 cursor-pointer">
+                <StarRating
+                  initialRating={rating}
+                  onRate={handleRating}
+                  disabled={ratingCooldown}
+                />
+                <span>Rate</span>
+              </div>
+            </div>
+          </div>
           {video.description && (
             <div className="mt-4 p-4 bg-gray-800 rounded">
               <h3 className="text-lg font-semibold mb-2">Description</h3>
               <p className="text-gray-300 whitespace-pre-wrap">{video.description}</p>
             </div>
           )}
-
-          <div className="flex gap-4 mt-4">
-            <button className="bg-indigo-600 px-4 py-2 rounded hover:bg-indigo-700">
-              Like ({video.like_count})
-            </button>
-            <button className="bg-green-600 px-4 py-2 rounded hover:bg-green-700">
-              Favorito
-            </button>
-            <button className="bg-red-600 px-4 py-2 rounded hover:bg-red-700">
-              Reportar
-            </button>
-          </div>
 
           <hr className="my-6 border-gray-700" />
           <CommentSection videoId={video.id} />
@@ -143,6 +228,19 @@ export default function VideoView() {
           <p className="text-white text-lg">Video not found... &#128577;</p>
         </div>
       )}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition={Bounce}
+      />
     </div>
   );
 }

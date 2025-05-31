@@ -1,10 +1,12 @@
 from flask import Blueprint, request, jsonify
 from flasgger import swag_from
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from services import like_service
+from services.like_service import LikeService
+from database import db_session
 import os
 
 like_bp = Blueprint('like_bp', __name__, url_prefix='/api/like')
+like_service = LikeService(db_session)
 swagger_path = os.path.normpath(os.path.join(os.path.dirname(__file__),
                                              '..', 'swagger', 'api_docs.yaml'))
 
@@ -18,16 +20,15 @@ def update_like_status():
         return jsonify({"error": "Missing JSON body"}), 400
 
     video_id = data.get('video_id')
-    if not video_id or not isinstance(video_id, int):
-        return jsonify({"error": "Missing or invalid video_id"}), 400
-
-    like_status = data.get('like')
-    if like_status is None or not isinstance(like_status, bool):
-        return jsonify({"error": "Missing or invalid 'like' field"}), 400
+    like_status = data.get('like_status')
+    if not isinstance(video_id, int):
+        return jsonify({"error": "Invalid or missing 'video_id'"}), 400
+    if not isinstance(like_status, bool):
+        return jsonify({"error": "Invalid or missing 'like'"}), 400
 
     user_id = get_jwt_identity()
-    message, status = like_service.toggle_like(user_id, video_id, like_status)
-    return jsonify({"message": message}), status
+    like_service.toggle_like(user_id, video_id, like_status)
+    return jsonify({"message": "Success"}), 200
 
 
 @like_bp.route('/user', methods=['GET'])
