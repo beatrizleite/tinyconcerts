@@ -17,7 +17,10 @@ def init_db(db_url=None):
 
     from models import user, video, achievement, comment, like, playlist, playlist_video, rating, report
 
-    engine = create_engine(db_url)
+    engine = create_engine(db_url,
+                           pool_size=50,
+                           max_overflow=50,
+                           pool_timeout=30)
 
     db_session.configure(bind=engine)
 
