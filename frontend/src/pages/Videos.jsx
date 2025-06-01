@@ -80,7 +80,7 @@ export default function Videos() {
       <form onSubmit={handleSearchSubmit} className="mb-6">
         <input
           type="text"
-          placeholder="Pesquisar vídeos..."
+          placeholder="Search videos..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           className="px-3 py-2 rounded-l bg-gray-700 text-white w-64"

@@ -3,6 +3,7 @@ from typing import List
 from models.video import Video
 from repositories.video_repo import VideoRepo
 from services.like_service import LikeService
+from services.favorite_service import FavoriteService
 import pandas as pd
 
 logger = logging.getLogger(__name__)
@@ -13,9 +14,10 @@ class NotFoundError(Exception):
 
 
 class VideoService:
-    def __init__(self, db_session, like_service=None):
+    def __init__(self, db_session, like_service=None, favorite_service=None):
         self.repo = VideoRepo(db_session)
         self.like_service = like_service or LikeService(db_session)
+        self.favorite_service = favorite_service or FavoriteService(db_session)
 
     def create_video(self, data: dict) -> Video:
         required_fields = ['title', 'video_link', 'image_320_180']
@@ -35,7 +37,8 @@ class VideoService:
         )
         return self.repo.add(video)
 
-    def get_video_by_id(self, video_id: int) -> dict:
+    def get_video_by_id(self, video_id: int,
+                        user_id: int | None = None) -> dict:
         video = self.repo.get_by_id(video_id)
         if not video:
             raise NotFoundError(f"Video with id {video_id} not found.")
@@ -44,6 +47,15 @@ class VideoService:
 
         like_count = self.like_service.get_likes_by_video(video_id)
         video_data['like_count'] = like_count
+        if user_id:
+            liked = self.like_service.is_liked_by_user(user_id, video_id)
+            favorited = self.favorite_service.is_favorited_by_user(user_id,
+                                                                   video_id)
+            video_data['liked'] = liked
+            video_data['favorited'] = favorited
+        else:
+            video_data['liked'] = False
+            video_data['favorited'] = False
 
         return video_data
 
@@ -77,7 +89,8 @@ class VideoService:
         """
         ext = file.filename.rsplit('.', 1)[-1].lower()
         if ext not in ['xls', 'xlsx', 'csv']:
-            raise ValueError("Invalid file type. Only xls, xlsx, and csv are supported.")
+            raise ValueError("Invalid file type. "
+                             "Only xls, xlsx, and csv are supported.")
 
         try:
             if ext == 'csv':
@@ -93,7 +106,9 @@ class VideoService:
             video_link = row.get('video_link')
             thumbnail = row.get('image_320_180')
 
-            if pd.notna(title) and pd.notna(video_link) and pd.notna(thumbnail):
+            if (pd.notna(title)
+                    and pd.notna(video_link)
+                    and pd.notna(thumbnail)):
                 video_data = {
                     'title': str(title),
                     'video_link': str(video_link),

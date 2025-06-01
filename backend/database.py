@@ -21,6 +21,7 @@ def init_db(db_url=None):
         achievement,
         comment,
         like,
+        favorite,
         playlist,
         playlist_video,
         rating,

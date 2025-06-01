@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flasgger import swag_from
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import (jwt_required,
+                                verify_jwt_in_request,
+                                get_jwt_identity)
 from database import db_session
 from services.video_service import VideoService
 import os
@@ -37,8 +39,15 @@ def get_video_by_id():
     if not video_id or not video_id.isdigit():
         return jsonify({"error": "Missing or invalid video_id"}), 400
 
+    user_id = None
     try:
-        video = video_service.get_video_by_id(int(video_id))
+        verify_jwt_in_request()
+        user_id = get_jwt_identity()
+    except Exception:
+        pass
+
+    try:
+        video = video_service.get_video_by_id(int(video_id), user_id=user_id)
     except FileNotFoundError:
         return jsonify({"message": "Video not foud"}), 404
 

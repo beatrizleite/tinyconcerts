@@ -5,11 +5,13 @@ const Carousel = ({ children, title = 192 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  const [dragged, setDragged] = useState(false);
 
   const handleMouseDown = (e) => {
     setIsDragging(true);
     setStartX(e.pageX);
     setScrollLeft(scrollContainerRef.current.scrollLeft);
+    setDragged(false);
     scrollContainerRef.current.style.cursor = 'grabbing';
     e.preventDefault();
   };
@@ -19,6 +21,9 @@ const Carousel = ({ children, title = 192 }) => {
     e.preventDefault();
     const x = e.pageX;
     const walk = (x - startX) * 1.2;
+    if (Math.abs(walk) > 5) {
+      setDragged(true)
+    }
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
   };
 
@@ -27,11 +32,17 @@ const Carousel = ({ children, title = 192 }) => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.style.cursor = 'grab';
     }
+    setTimeout(() => {
+      setDragged(false);
+    }, 0);
   };
 
   const handleMouseLeave = () => {
     if (isDragging) {
       setIsDragging(false);
+      if (dragged) {
+        setDragged(false);
+      }
       if (scrollContainerRef.current) {
         scrollContainerRef.current.style.cursor = 'grab';
       }
@@ -41,6 +52,7 @@ const Carousel = ({ children, title = 192 }) => {
   const childrenWithProps = React.Children.map(children, (child) =>
     React.cloneElement(child, {
       isDragging,
+      dragged,
       style: { cursor: isDragging ? 'grabbing' : 'pointer', ...(child.props.style || {}) },
     })
   );

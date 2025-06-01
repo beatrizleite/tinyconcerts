@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import VideoPlayer from "../components/VideoPlayer";
 import CommentSection from "../components/CommentSection";
-import { ThumbsUp, Star, StarHalf } from "lucide-react"
+import { ThumbsUp, Heart } from "lucide-react"
 import { useAuth } from "../context/AuthContext";
 import { toast, ToastContainer, Bounce } from "react-toastify";
 import StarRating from "../components/ui/StarRating"
@@ -17,6 +17,9 @@ export default function VideoView() {
 
   const [liked, setLiked] = useState(false)
   const [likeCooldown, setLikeCooldown] = useState(false);
+
+  const [favorited, setFavorited] = useState(false);
+  const [favoriteCooldown, setFavoriteCooldown] = useState(false);
 
   const [rating, setRating] = useState(0);
   const [ratingCooldown, setRatingCooldown] = useState(false);
@@ -40,6 +43,12 @@ export default function VideoView() {
         setVideo(videoData);
         if (videoData.rating) {
           setRating(videoData.rating)
+        }
+        if (videoData.liked) {
+          setLiked(videoData.liked);
+        }
+        if (videoData.favorited) {
+          setFavorited(videoData.favorited);
         }
       } catch (err) {
         setError(err.message);
@@ -83,6 +92,38 @@ export default function VideoView() {
       setTimeout(() => setLikeCooldown(false), 1000);
     }
   }
+
+  const handleFavorite = async () => {
+    if (!isAuthenticated) {
+      toast.warning("Please log in to favorite this video!");
+      return;
+    }
+    if (favoriteCooldown) return;
+    setFavoriteCooldown(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favorite`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          video_id: parseInt(id),
+          favorite_status: favorited
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to favorite video");
+
+      setFavorited(!favorited);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setTimeout(() => setFavoriteCooldown(false), 1000);
+    }
+  }
+
 
   const handleRating = async (newRating) => {
     if (!isAuthenticated) {
@@ -201,6 +242,12 @@ export default function VideoView() {
               disabled={likeCooldown}
               className="flex flex-col items-center justify-center gap-1 cursor-pointer">
               <ThumbsUp fill={liked ? "#2e9aff" : "none"} /> Like
+            </button>
+            <button
+              onClick={handleFavorite}
+              disabled={favoriteCooldown}
+              className="flex flex-col items-center justify-center gap-1 cursor-pointer">
+              <Heart fill={favorited ? "#ff2e63" : "none"} /> Favorite
             </button>
             <div className="flex flex-col items-center gap-1">
               <div className="flex flex-col items-center justify-center gap-1 cursor-pointer">

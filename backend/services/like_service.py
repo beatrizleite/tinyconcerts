@@ -29,3 +29,6 @@ class LikeService:
 
     def get_likes_by_video(self, video_id: int):
         return self.repo.get_like_count_by_video(video_id)
+
+    def is_liked_by_user(self, user_id: int, video_id: int):
+        return self.repo.is_liked_by_user(user_id, video_id)

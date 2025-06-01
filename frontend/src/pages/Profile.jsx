@@ -7,6 +7,7 @@ export default function Profile() {
   const [message, setMessage] = useState("");
   const [favorites, setFavorites] = useState([]);
   const [liked, setLiked] = useState([]);
+  const [importFile, setImportFile] = useState(null);
 
   let userId = localStorage.getItem("user_id");
 
@@ -85,6 +86,42 @@ export default function Profile() {
     }
   };
 
+  const handleImportFileChange = (e) => {
+    setImportFile(e.target.files[0]);
+  };
+
+  const handleImportSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!importFile) {
+      alert("Por favor, escolhe um ficheiro CSV ou Excel.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", importFile);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/video/import`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert(`Importação bem sucedida! Foram importados ${data.created_video_ids.length} vídeos.`);
+      } else {
+        alert(`Falha na importação: ${data.error}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao importar o ficheiro.");
+    }
+  };
+
   if (!userData) return <p className="text-white text-center mt-10">A carregar perfil...</p>;
 
   return (
@@ -128,7 +165,7 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Coluna direita - Área reservada aos vídeos */}
+        {/* Coluna direita - Área reservada aos vídeos e importação */}
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:rotate-6 sm:rounded-3xl"></div>
           <div className="relative px-8 py-10 bg-gray-800 shadow-lg sm:rounded-3xl sm:p-10 text-white z-10">
@@ -136,7 +173,7 @@ export default function Profile() {
             <p className="text-gray-300 text-center mb-6">
               Em breve poderás gerir aqui os teus vídeos favoritos e os que recebeste likes.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               {favorites.map((video) => (
                 <VideoCard key={video.id} video={video} />
               ))}
@@ -144,6 +181,25 @@ export default function Profile() {
                 <p className="text-gray-400">Sem favoritos ainda.</p>
               )}
             </div>
+
+            {/* Importação de CSV/Excel */}
+            <div className="mt-8">
+              <h3 className="text-xl font-semibold mb-2">Importar vídeos (CSV/Excel)</h3>
+              <form onSubmit={handleImportSubmit} className="flex flex-col gap-2">
+                <input
+                  type="file"
+                  accept=".csv, .xlsx"
+                  onChange={handleImportFileChange}
+                  className="p-2 bg-gray-700 rounded focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                  Carregar
+                </button>
+              </form>
+            </div>
+
           </div>
         </div>
       </div>

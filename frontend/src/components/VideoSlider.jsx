@@ -6,19 +6,16 @@ import React, { useState, useEffect } from 'react';
 const VideoSlider = ({ videos, title, onVideoClick }) => {
   const [timedOut, setTimedOut] = useState(false);
 
-  // Consider loading as true if no videos and not timed out
   const isLoading = videos.length === 0 && !timedOut;
 
   useEffect(() => {
     if (videos.length === 0) {
-      // Start timer only if videos are empty
       const timer = setTimeout(() => {
         setTimedOut(true);
-      }, 10000); // 10 seconds
+      }, 10000);
 
       return () => clearTimeout(timer);
     } else {
-      // If videos arrive before timeout, reset timedOut
       setTimedOut(false);
     }
   }, [videos]);

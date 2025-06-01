@@ -36,3 +36,9 @@ class LikeRepo:
         return self.db.query(func.count(Like.id)).filter(
             Like.user_id == user_id, Like.like.is_(True)
         ).scalar()
+
+    def is_liked_by_user(self, user_id: int, video_id: int) -> bool:
+        like = self.db.query(Like).filter_by(user_id=user_id,
+                                             video_id=video_id,
+                                             like=True).first()
+        return like is not None

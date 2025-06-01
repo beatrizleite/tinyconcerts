@@ -29,7 +29,7 @@ class VideoRepo:
         return self.db.query(Video).filter(
             Video.title.ilike(f'%{keyword}%')
         ).all()
-    
+
     def search_videos(self, keyword: str, page: int, per_page: int):
         query = self.db.query(Video).filter(
             Video.title.ilike(f'%{keyword}%') | Video.description.ilike(
