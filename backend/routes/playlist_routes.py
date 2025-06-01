@@ -24,6 +24,7 @@ def create_playlist():
 
 @playlist_bp.route('', methods=['GET'])
 @swag_from(swagger_path, methods=['GET'])
+@jwt_required()
 def get_playlist_by_id():
     playlist_id = request.args.get('playlist_id')
     if not playlist_id:
@@ -66,6 +67,7 @@ def delete_playlist():
 
 @playlist_bp.route('/user', methods=['GET'])
 @swag_from(swagger_path, methods=['GET'])
+@jwt_required()
 def get_playlists_by_user():
     user_id = request.args.get('user_id')
     if not user_id:

@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Home from './pages/Home';
 import Videos from './pages/Videos';
 import Playlists from './pages/Playlists';
+import CreatePlaylist from './pages/CreatePlaylist';
 import About from './pages/About';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
@@ -12,9 +13,9 @@ import Modal from './components/ui/Modal'
 import { useState } from 'react'
 import { AuthProvider } from './context/AuthContext';
 import VideoView from './pages/VideoView';
+import ProtectedRoute from './components/ProtectedRoute'
 function App() {
 
-  const [isLoggedIn] = useState(true)
   const [showLogin, setShowLogin] = useState(false)
   const [showRegister, setShowRegister] = useState(false)
 
@@ -34,11 +35,16 @@ function App() {
             <Route path='/about' element={<About />} />
             <Route path="/video/:id" element={<VideoView />} />
 
-            <Route path="/profile"
-              element={
-                isLoggedIn ? <Profile /> : <Navigate to="/" replace />
-              }
-            />
+            <Route path='/createplaylist' element={
+              <ProtectedRoute>
+                <CreatePlaylist />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
           </Routes>
           <Modal isOpen={showLogin} onClose={() => setShowLogin(false)}>
             <Login onSuccess={() => setShowLogin(false)} />

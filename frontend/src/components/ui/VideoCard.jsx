@@ -32,10 +32,6 @@ const VideoCard = ({ video, onClick, isDragging, dragged }) => {
           </div>
         )}
 
-        {/*<div className="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-sm px-2 py-1 rounded text-[12px]">
-          {video.duration}
-        </div>*/}
-
         <div className="absolute inset-0 bg-black rounded-lg opacity-0 group-hover:opacity-50 transition-opacity duration-300 flex items-center justify-center">
           <Play className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
         </div>

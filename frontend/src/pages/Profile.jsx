@@ -6,7 +6,7 @@ export default function Profile() {
   const [userData, setUserData] = useState(null);
   const [message, setMessage] = useState("");
   const [favorites, setFavorites] = useState([]);
-  const [liked, setLiked] = useState([]);
+  const [setLiked] = useState([]);
   const [importFile, setImportFile] = useState(null);
 
   let userId = localStorage.getItem("user_id");
@@ -127,7 +127,6 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gray-900 py-10 px-6 sm:px-12">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {/* Coluna esquerda - Formulário de perfil */}
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
           <div className="relative px-8 py-10 bg-gray-800 shadow-lg sm:rounded-3xl sm:p-10 text-white z-10">
@@ -165,7 +164,6 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Coluna direita - Área reservada aos vídeos e importação */}
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:rotate-6 sm:rounded-3xl"></div>
           <div className="relative px-8 py-10 bg-gray-800 shadow-lg sm:rounded-3xl sm:p-10 text-white z-10">
@@ -182,7 +180,6 @@ export default function Profile() {
               )}
             </div>
 
-            {/* Importação de CSV/Excel */}
             <div className="mt-8">
               <h3 className="text-xl font-semibold mb-2">Importar vídeos (CSV/Excel)</h3>
               <form onSubmit={handleImportSubmit} className="flex flex-col gap-2">
