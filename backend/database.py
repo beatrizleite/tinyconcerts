@@ -15,17 +15,32 @@ def init_db(db_url=None):
 
     global engine
 
-    from models import user, video, achievement, comment, like, playlist, playlist_video, rating, report
+    from models import (
+        user,
+        video,
+        achievement,
+        comment,
+        like,
+        playlist,
+        playlist_video,
+        rating,
+        report
+    )  # noqa: F401
 
-    engine = create_engine(db_url,
-                           pool_size=50,
-                           max_overflow=50,
-                           pool_timeout=30)
+    if db_url.startswith('sqlite'):
+        engine = create_engine(
+            db_url,
+            connect_args={"check_same_thread": False}
+        )
+    else:
+        engine = create_engine(db_url,
+                               pool_size=50,
+                               max_overflow=50,
+                               pool_timeout=30
+                               )
 
     db_session.configure(bind=engine)
-
     Base.query = db_session.query_property()
-
     Base.metadata.create_all(bind=engine)
 
 
