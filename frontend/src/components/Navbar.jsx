@@ -47,7 +47,6 @@ useEffect(() => {
                 </li>
             </ul>
             <div className='flex items-center gap-4'>
-                <SearchInput className='hidden xl:block' />
                 <div className='hidden xl:block relative'>
                     <div onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         className='w-10 h-10 rounded-full bg-gray-800 p-2 border-transparent hover:border-red-500 hover:bg-gray-700 transition-colors cursor-pointer'>
@@ -143,9 +142,6 @@ useEffect(() => {
                         )}
                     </ul>
                 )}
-                <div className="w-11/12 my-2">
-                    <SearchInput />
-                </div>
             </div>
         </header>
     )
