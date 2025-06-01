@@ -29,6 +29,15 @@ class VideoRepo:
         return self.db.query(Video).filter(
             Video.title.ilike(f'%{keyword}%')
         ).all()
+    
+    def search_videos(self, keyword: str, page: int, per_page: int):
+        query = self.db.query(Video).filter(
+            Video.title.ilike(f'%{keyword}%') | Video.description.ilike(
+                f'%{keyword}%')
+        )
+        total = query.count()
+        videos = query.offset((page - 1) * per_page).limit(per_page).all()
+        return videos, total
 
     def get_random_videos(self, limit=10):
         return self.db.query(Video).order_by(func.random()).limit(limit).all()
@@ -48,3 +57,6 @@ class VideoRepo:
 
     def get_most_recent_videos(self, limit=10):
         return self.db.query(Video).order_by(Video.published_at.desc()).limit(limit).all()
+
+    def get_all_videos(self):
+        return self.db.query(Video)

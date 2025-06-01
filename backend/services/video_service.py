@@ -64,13 +64,7 @@ class VideoService:
         self.repo.delete(video)
 
     def search_videos(self, keyword, page, per_page):
-        query = self.db_session.query(Video).filter(
-            Video.title.ilike(f'%{keyword}%') | Video.description.ilike(
-                f'%{keyword}%')
-        )
-        total = query.count()
-        videos = query.offset((page - 1) * per_page).limit(per_page).all()
-        return videos, total
+        return self.repo.search_videos(keyword, page, per_page)
 
     def report_video(self, video_id: int, report_data: dict) -> bool:
         logger.info(f"Video {video_id} reported with data: {report_data}")
@@ -148,7 +142,7 @@ class VideoService:
                 setattr(obj, field, data[field])
 
     def get_all_videos(self, page, per_page):
-        query = self.db_session.query(Video)
+        query = self.repo.get_all_videos()
         total = query.count()
         videos = query.offset((page - 1) * per_page).limit(per_page).all()
         return videos, total
