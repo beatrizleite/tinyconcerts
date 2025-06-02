@@ -1,26 +1,26 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-      {
-        "label": "Run Flask Backend",
-        "type": "shell",
-        "command": "cd backend && venv/Scripts/activate && python app.py",
-        "problemMatcher": [],
-        "group": {
-          "kind": "build",
-          "isDefault": true
-        }
-      },
-      {
-        "label": "Run React Frontend",
-        "type": "shell",
-        "command": "cd frontend && npm start",
-        "problemMatcher": [],
-        "group": {
-          "kind": "build",
-          "isDefault": true
-        }
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Flask Backend",
+      "type": "shell",
+      "command": "cd backend && venv\\Scripts\\python.exe app.py",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
       }
-    ]
-  }
-  
+    },
+    {
+      "label": "Run React Frontend",
+      "type": "shell",
+      "command": "cd frontend && npm start",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
+

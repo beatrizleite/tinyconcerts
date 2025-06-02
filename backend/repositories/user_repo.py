@@ -5,13 +5,13 @@ class UserRepo:
     def __init__(self, db_session):
         self.db = db_session
 
-    def getById(self, user_id: int):
+    def get_by_id(self, user_id: int):
         return self.db.query(User).get(user_id)
 
-    def getAll(self):
+    def get_all(self):
         return self.db.query(User).all()
 
-    def getByUsername(self, username: str):
+    def get_by_username(self, username: str):
         return self.db.query(User).filter(User.username == username).first()
 
     def create(self, user: User):
