@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - deploy
+      - dev
 
 jobs:
   test:
@@ -52,6 +53,7 @@ jobs:
         run: CI=true npm test -- --watchAll=false
 
   deploy:
+    if: github.ref == 'refs/heads/deploy'
     needs: test
     runs-on: ubuntu-latest
     steps:
