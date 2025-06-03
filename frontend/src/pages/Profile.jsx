@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [message, setMessage] = useState("");
   const [favorites, setFavorites] = useState([]);
-  const [setLiked] = useState([]);
+  const [likedVideos, setLikedVideos] = useState([]);
   const [importFile, setImportFile] = useState(null);
 
   let userId = localStorage.getItem("user_id");
@@ -27,7 +29,6 @@ export default function Profile() {
     const fetchUserData = async () => {
       try {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user?user_id=${userId}`, {
-          method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -38,31 +39,36 @@ export default function Profile() {
 
         const data = await res.json();
         setUserData(data);
-
-        const fakeVideos = [
-          {
-            id: 1,
-            title: "Vídeo A",
-            thumbnail: "https://placehold.co/320x180",
-            views: 1500,
-            uploaded: "2024-05-01",
-          },
-          {
-            id: 2,
-            title: "Vídeo B",
-            thumbnail: "https://placehold.co/320x180",
-            views: 980,
-            uploaded: "2024-05-15",
-          },
-        ];
-        setFavorites(fakeVideos);
-        setLiked(fakeVideos.slice(1));
       } catch (err) {
         console.error("Erro ao buscar perfil:", err);
       }
     };
 
-    if (userId && token) fetchUserData();
+    const fetchFavoritesAndLikes = async () => {
+      try {
+        const [favRes, likeRes] = await Promise.all([
+          fetch(`${import.meta.env.VITE_API_URL}/api/favorite/user`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${import.meta.env.VITE_API_URL}/api/like/user`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        const favData = await favRes.json();
+        const likeData = await likeRes.json();
+
+        setFavorites(favData.favorites || []);
+        setLikedVideos(likeData.likes || []);
+      } catch (err) {
+        console.error("Erro ao buscar favoritos ou likes:", err);
+      }
+    };
+
+    if (userId && token) {
+      fetchUserData();
+      fetchFavoritesAndLikes();
+    }
   }, [userId, token]);
 
   const handleChange = (e) => {
@@ -124,93 +130,112 @@ export default function Profile() {
 
   if (!userData) return <p className="text-white text-center mt-10">A carregar perfil...</p>;
 
+const handleClick = (videoId) => {
+  navigate(`/video/${videoId}`);
+};
+
   return (
     <div className="min-h-screen bg-gray-900 py-10 px-6 sm:px-12">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
-          <div className="relative px-8 py-10 bg-gray-800 shadow-lg sm:rounded-3xl sm:p-10 text-white z-10">
-            <h1 className="text-3xl font-bold text-center mb-6">Perfil</h1>
-            <p className="text-center text-gray-300 mb-6">Atualiza os teus dados</p>
-            <form onSubmit={handleSave} className="space-y-4">
-              <input name="username" value={userData.username} onChange={handleChange}
-                placeholder="Username"
-                className="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-              <input name="email" value={userData.email} onChange={handleChange}
-                placeholder="Email"
-                className="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-              <input name="fname" value={userData.fname} onChange={handleChange}
-                placeholder="Primeiro nome"
-                className="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-              <input name="lname" value={userData.lname} onChange={handleChange}
-                placeholder="Último nome"
-                className="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-              <input name="birthday" value={userData.birthday?.split("T")[0]} onChange={handleChange}
-                type="date"
-                className="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-              <div className="flex justify-between pt-4">
-                <button type="submit"
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
-                  Guardar
-                </button>
-                <button type="reset"
-                  onClick={() => setUserData({ ...userData })}
-                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
-                  Cancelar
-                </button>
-              </div>
+
+        {/* 🔹 Formulário de Perfil */}
+        <div className="px-8 py-10 bg-gray-800 shadow-lg sm:rounded-3xl sm:p-10 text-white">
+          <h1 className="text-3xl font-bold text-center mb-6">Perfil</h1>
+          <p className="text-center text-gray-300 mb-6">Atualiza os teus dados</p>
+
+          <form onSubmit={handleSave} className="space-y-4">
+            <input name="username" value={userData.username} onChange={handleChange}
+              placeholder="Username"
+              className="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <input name="email" value={userData.email} onChange={handleChange}
+              placeholder="Email"
+              className="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <input name="fname" value={userData.fname} onChange={handleChange}
+              placeholder="Primeiro nome"
+              className="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <input name="lname" value={userData.lname} onChange={handleChange}
+              placeholder="Último nome"
+              className="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <input name="birthday" value={userData.birthday?.split("T")[0]} onChange={handleChange}
+              type="date"
+              className="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <div className="flex justify-between pt-4">
+              <button type="submit"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                Guardar
+              </button>
+              <button type="reset"
+                onClick={() => setUserData({ ...userData })}
+                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+                Cancelar
+              </button>
+            </div>
+          </form>
+
+          {message && <p className="mt-4 text-sm text-center">{message}</p>}
+        </div>
+
+        {/* 🔹 Área de Vídeos */}
+        <div className="px-8 py-10 bg-gray-800 shadow-lg sm:rounded-3xl sm:p-10 text-white">
+          <h2 className="text-2xl font-bold mb-4 text-center">Área de Vídeos</h2>
+
+          <h2 className="text-lg font-semibold mb-2">Favoritos</h2>
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+  {favorites.length > 0 ? (
+    favorites.map((video) => (
+<VideoCard key={video.video_id} video={video} onClick={() => handleClick(video.video_id)} />
+    ))
+  ) : (
+    <p className="text-gray-400">Sem favoritos ainda.</p>
+  )}
+</div>
+
+<h2 className="text-lg font-semibold mb-2">Vídeos com Likes</h2>
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+  {likedVideos.length > 0 ? (
+    likedVideos.map((video) => (
+      <VideoCard key={video.id} video={video} onClick={handleClick} />
+    ))
+  ) : (
+    <p className="text-gray-400">Sem likes ainda.</p>
+  )}
+</div>
+
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-2">Importar vídeos (CSV/Excel)</h3>
+            <form onSubmit={handleImportSubmit} className="flex flex-col gap-2">
+              <input
+                type="file"
+                accept=".csv, .xlsx"
+                onChange={handleImportFileChange}
+                className="p-2 bg-gray-700 rounded focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                Carregar
+              </button>
             </form>
-            {message && <p className="mt-4 text-sm text-center">{message}</p>}
           </div>
         </div>
 
-        <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:rotate-6 sm:rounded-3xl"></div>
-          <div className="relative px-8 py-10 bg-gray-800 shadow-lg sm:rounded-3xl sm:p-10 text-white z-10">
-            <h2 className="text-2xl font-bold mb-4 text-center">Área de Vídeos</h2>
-            <p className="text-gray-300 text-center mb-6">
-              Em breve poderás gerir aqui os teus vídeos favoritos e os que recebeste likes.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-              {favorites.map((video) => (
-                <VideoCard key={video.id} video={video} />
-              ))}
-              {favorites.length === 0 && (
-                <p className="text-gray-400">Sem favoritos ainda.</p>
-              )}
-            </div>
-
-            <div className="mt-8">
-              <h3 className="text-xl font-semibold mb-2">Importar vídeos (CSV/Excel)</h3>
-              <form onSubmit={handleImportSubmit} className="flex flex-col gap-2">
-                <input
-                  type="file"
-                  accept=".csv, .xlsx"
-                  onChange={handleImportFileChange}
-                  className="p-2 bg-gray-700 rounded focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
-                  Carregar
-                </button>
-              </form>
-            </div>
-
-          </div>
-        </div>
       </div>
     </div>
   );
 }
 
-function VideoCard({ video }) {
+function VideoCard({ video, onClick }) {
   return (
-    <div className="bg-gray-700 rounded-lg shadow p-3">
-      <img src={video.thumbnail} alt={video.title} className="w-full h-40 object-cover rounded mb-2" />
+    <div 
+      onClick={() => onClick(video.video_id)}  // aqui
+      className="bg-gray-700 rounded-lg shadow p-3 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-transform"
+    >
+      <img src={video.image_320_180} alt={video.title} className="w-full h-40 object-cover rounded mb-2" />
       <h4 className="text-white font-semibold">{video.title}</h4>
-      <p className="text-sm text-gray-300">{video.views} views</p>
+      <p className="text-sm text-gray-300">{video.views ?? 'N/A'} views</p>
       <p className="text-sm text-gray-400">{video.uploaded}</p>
     </div>
   );
 }
+
+

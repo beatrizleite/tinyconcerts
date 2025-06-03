@@ -16,8 +16,14 @@ class FavoriteRepo:
         ).first()
 
     def get_by_user(self, user_id: int):
-        return self.db.query(Favorite).filter(
-            Favorite.user_id == user_id).all()
+        return (
+        self.db.query(Favorite)
+        .join(Favorite.video)
+        .filter(Favorite.user_id == user_id, Favorite.favorite.is_(True))
+        .all()
+    )
+
+
 
     def get_by_video(self, video_id: int):
         return self.db.query(Favorite).filter(

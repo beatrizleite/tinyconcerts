@@ -157,7 +157,7 @@ export default function CreatePlaylist() {
         console.log('Adding videos to playlist:', selectedVideos.length);
         
         const addVideoPromises = selectedVideos.map(async (video) => {
-          const response = await fetch(`${baseUrl}/api/video/playlist/add`, {
+          const response = await fetch(`${baseUrl}/api/playlist/video/add`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,

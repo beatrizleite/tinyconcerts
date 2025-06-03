@@ -14,6 +14,7 @@ import { useState } from 'react'
 import { AuthProvider } from './context/AuthContext';
 import VideoView from './pages/VideoView';
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminDashboard from './pages/AdminDashboard';
 function App() {
 
   const [showLogin, setShowLogin] = useState(false)
@@ -34,6 +35,8 @@ function App() {
             <Route path='/playlists' element={<Playlists />} />
             <Route path='/about' element={<About />} />
             <Route path="/video/:id" element={<VideoView />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+
 
             <Route path='/createplaylist' element={
               <ProtectedRoute>

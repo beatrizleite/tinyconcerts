@@ -24,105 +24,123 @@ export default function VideoView() {
   const [rating, setRating] = useState(0);
   const [ratingCooldown, setRatingCooldown] = useState(false);
 
-  useEffect(() => {
-    const fetchVideo = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/video?video_id=${id}`);
-        
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Video not found');
-          }
-          throw new Error('Error while loading video');
-        }
-        
-        const videoData = await response.json();
-        setVideo(videoData);
-        if (videoData.rating) {
-          setRating(videoData.rating)
-        }
-        if (videoData.liked) {
-          setLiked(videoData.liked);
-        }
-        if (videoData.favorited) {
-          setFavorited(videoData.favorited);
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchVideo();
-    }
-  }, [id]);
-
-  const handleLike = async () => {
-    if (!isAuthenticated) {
-      toast.warning("Please log in to like this video!")
-      return;
-    }
-    if (likeCooldown) return;
-    setLikeCooldown(true)
-
+useEffect(() => {
+  const fetchVideo = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/like`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          video_id: parseInt(id),
-          like_status: liked
+      setLoading(true);
+      setError(null);
+
+      // Busca o vídeo
+      const videoRes = await fetch(`${import.meta.env.VITE_API_URL}/api/video?video_id=${id}`);
+      if (!videoRes.ok) throw new Error('Erro ao buscar vídeo');
+      const videoData = await videoRes.json();
+      setVideo(videoData);
+      if (videoData.rating) setRating(videoData.rating);
+
+      // Se não estiver autenticado, não verifica likes/favoritos
+      if (!isAuthenticated || !token) return;
+
+      // Busca likes e favoritos do utilizador
+      const [likeRes, favRes] = await Promise.all([
+        fetch(`${import.meta.env.VITE_API_URL}/api/like/user`, {
+          headers: { Authorization: `Bearer ${token}` },
         }),
-      });
-
-      if (!response.ok) throw new Error("Failed to like video");
-      
-      setLiked(!liked)
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setTimeout(() => setLikeCooldown(false), 1000);
-    }
-  }
-
-  const handleFavorite = async () => {
-    if (!isAuthenticated) {
-      toast.warning("Please log in to favorite this video!");
-      return;
-    }
-    if (favoriteCooldown) return;
-    setFavoriteCooldown(true);
-
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favorite`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          video_id: parseInt(id),
-          favorite_status: favorited
+        fetch(`${import.meta.env.VITE_API_URL}/api/favorite/user`, {
+          headers: { Authorization: `Bearer ${token}` },
         }),
-      });
+      ]);
 
-      if (!response.ok) throw new Error("Failed to favorite video");
+      const likesData = await likeRes.json();
+      const favData = await favRes.json();
 
-      setFavorited(!favorited);
+      // Extrai os IDs dos vídeos
+      const likedIds = likesData.likes?.map(v => v.video_id) || [];
+      const favoritedIds = favData.favorites?.map(v => v.video_id) || [];
+
+      setLiked(likedIds.includes(parseInt(id)));
+      setFavorited(favoritedIds.includes(parseInt(id)));
+
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      setError(err.message);
     } finally {
-      setTimeout(() => setFavoriteCooldown(false), 1000);
+      setLoading(false);
     }
+  };
+
+  if (id) {
+    fetchVideo();
   }
+}, [id, isAuthenticated, token]);
+
+
+ const handleLike = async () => {
+  if (!isAuthenticated) {
+    toast.warning("Please log in to like this video!");
+    return;
+  }
+  if (likeCooldown) return;
+  setLikeCooldown(true);
+
+  const newLikeStatus = !liked;
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/like`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        video_id: parseInt(id),
+        like_status: newLikeStatus
+      }),
+    });
+
+    if (!response.ok) throw new Error("Failed to like video");
+
+    setLiked(newLikeStatus);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    setTimeout(() => setLikeCooldown(false), 1000);
+  }
+}
+
+
+const handleFavorite = async () => {
+  if (!isAuthenticated) {
+    toast.warning("Please log in to favorite this video!");
+    return;
+  }
+  if (favoriteCooldown) return;
+  setFavoriteCooldown(true);
+
+  const newFavoriteStatus = !favorited;
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favorite`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        video_id: parseInt(id),
+        favorite_status: newFavoriteStatus
+      }),
+    });
+
+    if (!response.ok) throw new Error("Failed to favorite video");
+
+    setFavorited(newFavoriteStatus);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    setTimeout(() => setFavoriteCooldown(false), 1000);
+  }
+}
+
 
 
   const handleRating = async (newRating) => {

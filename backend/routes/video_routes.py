@@ -75,7 +75,7 @@ def update_video():
 
 @video_bp.route('', methods=['DELETE'])
 @swag_from(swagger_path, methods=['DELETE'])
-@jwt_required
+@jwt_required()
 def delete_video():
     """Delete Video"""
     video_id = request.args.get('video_id')
