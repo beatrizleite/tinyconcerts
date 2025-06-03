@@ -44,8 +44,15 @@ def get_user_by_id():
     user = user_service.getUser(user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
-    return jsonify({"id": user.id, "username": user.username}), 200
 
+    return jsonify({
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+        "fname": user.fname,
+        "lname": user.lname,
+        "birthday": user.birthday.isoformat() if user.birthday else None
+    }), 200
 
 @user_bp.route('', methods=['PUT'])
 @swag_from(swagger_path, methods=['PUT'])

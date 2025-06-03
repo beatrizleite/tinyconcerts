@@ -12,13 +12,13 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isSubMenuOpen, setIsSubMenuOpen] = useState(false)
     const location = useLocation()
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, logout, role } = useAuth();
 
     const isActive = (path) => location.pathname === path
-    
-useEffect(() => {
-  setIsDropdownOpen(false);
-}, [location.pathname]);
+
+    useEffect(() => {
+        setIsDropdownOpen(false);
+    }, [location.pathname]);
     return (
         <header className="relative z-50 flex justify-between items-center !text-white py-5 px-8 md:px-12 bg-gray-950 drop-shadow-md">
             <Link to='/' className='!text-white hover:!text-white'>
@@ -55,18 +55,21 @@ useEffect(() => {
                     {isDropdownOpen && (
                         <div className='absolute right-0 top-12 bg-gray-800 !text-white rounded-md shadow-lg w-48'>
                             <ul className='p-2'>
-                                {isAuthenticated  ? (
+                                {isAuthenticated ? (
                                     <>
                                         <li>
                                             <Link to='/profile' className='block px-4 py-2 hover:bg-red-500 !text-white hover:!text-white rounded-md cursor-pointer'>
                                                 Profile
                                             </Link>
                                         </li>
-                                        <li>
-                                            <Link to='/admin' className='block px-4 py-2 hover:bg-red-500 !text-white hover:!text-white rounded-md cursor-pointer'>
-                                                Admin
-                                            </Link>
-                                        </li>
+                                        {role === 1 && (
+                                            <li>
+                                                <Link to='/admin' className='block px-4 py-2 hover:bg-red-500 !text-white hover:!text-white rounded-md cursor-pointer'>
+                                                    Admin
+                                                </Link>
+                                            </li>
+                                        )}
+
 
                                         <li className='px-4 py-2 hover:bg-red-500 rounded-md cursor-pointer'>Settings</li>
                                         <li onClick={logout} className="px-4 py-2 hover:bg-red-500 rounded-md cursor-pointer">
@@ -139,8 +142,8 @@ useEffect(() => {
                                 </li>
 
                                 <li onClick={logout} className="px-4 py-2 hover:bg-red-500 rounded-md cursor-pointer">
-                                            Logout
-                                        </li>
+                                    Logout
+                                </li>
                             </>
                         ) : (
                             <>
