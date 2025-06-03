@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Videos from './pages/Videos';
 import Playlists from './pages/Playlists';
 import CreatePlaylist from './pages/CreatePlaylist';
+import PlaylistDetail from './pages/PlaylistDetail';
 import About from './pages/About';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
@@ -34,10 +35,13 @@ function AppContent() {
         <Route path='/about' element={<About />} />
         <Route path='/video/:id' element={<VideoView />} />
 
-        <Route
-          path="/admin"
-          element={
-            role === 1 ? <AdminDashboard /> : <Navigate to="/" replace />
+        <Route path="/admin" element={
+            role === 1 ? 
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+            :
+            <Navigate to="/" replace />
           }
         />
 
@@ -46,6 +50,11 @@ function AppContent() {
             <CreatePlaylist />
           </ProtectedRoute>
         } />
+        <Route path='/playlist' element={
+              <ProtectedRoute>
+                <PlaylistDetail />
+              </ProtectedRoute>
+            } />
         <Route path="/profile" element={
           <ProtectedRoute>
             <Profile />

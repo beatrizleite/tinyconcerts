@@ -48,7 +48,8 @@ class VideoRepo:
                 Video,
                 func.count(Like.id).label('likes_count')
             )
-            .join(Like, (Like.video_id == Video.id) & (Like.like == True), isouter=True)
+            .join(Like, (Like.video_id == Video.id) &
+                  (Like.like is True), isouter=True)
             .group_by(Video.id)
             .order_by(func.count(Like.id).desc())
             .limit(limit)
@@ -56,7 +57,8 @@ class VideoRepo:
         )
 
     def get_most_recent_videos(self, limit=10):
-        return self.db.query(Video).order_by(Video.published_at.desc()).limit(limit).all()
+        return self.db.query(Video).order_by(Video.published_at.desc()).limit(
+            limit).all()
 
     def get_all_videos(self):
         return self.db.query(Video)

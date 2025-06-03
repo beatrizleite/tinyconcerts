@@ -3,6 +3,7 @@ from services.playlist_video_service import PlaylistVideoService
 from repositories.playlist_repo import PlaylistRepo
 from repositories.video_repo import VideoRepo
 from repositories.playlist_video_repo import PlaylistVideoRepo
+from flask_jwt_extended import jwt_required
 from database import db_session
 
 playlist_video_bp = Blueprint('playlist_video_bp', __name__,
@@ -16,7 +17,30 @@ playlist_video_service = PlaylistVideoService(playlist_repo,
                                               playlist_video_repo)
 
 
-@playlist_video_bp.route('/add', methods=['POST'])
+@playlist_video_bp.route('/<int:playlist_id>', methods=['GET'],
+                         strict_slashes=False)
+@jwt_required()
+def get_playlist_videos(playlist_id):
+    """Get videos in a playlist with pagination"""
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+
+    if page < 1:
+        return jsonify({"error": "Page must be greater than 0"}), 400
+    if per_page < 1 or per_page > 100:
+        return jsonify({"error": "Per page must be between 1 and 100"}), 400
+
+    try:
+        result = playlist_video_service.get_playlist_videos_paginated(
+            db_session, playlist_id, page, per_page
+        )
+        return jsonify(result), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@playlist_video_bp.route('/', methods=['POST'])
+@jwt_required()
 def add_video_to_playlist():
     data = request.get_json()
     playlist_id = data.get('playlist_id')
@@ -41,7 +65,8 @@ def add_video_to_playlist():
         return jsonify({"error": str(e)}), 400
 
 
-@playlist_video_bp.route('/remove', methods=['POST'])
+@playlist_video_bp.route('/', methods=['DELETE'])
+@jwt_required()
 def remove_video_from_playlist():
     data = request.get_json()
     playlist_id = data['playlist_id']
