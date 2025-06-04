@@ -7,14 +7,14 @@ class Video(Base):
     __tablename__ = 'videos'
 
     id = Column(Integer, primary_key=True)
-    title = Column(String(100), nullable=False)
+    title = Column(String(255), nullable=False)
     description = Column(Text)
     video_link = Column(Text, nullable=False)
     category = Column(String(100))
     published_at = Column(String(100))
-    owner = Column(String(100))
-    owner_url = Column(String(100))
-    image_320_180 = Column(String(100))
+    owner = Column(String())
+    owner_url = Column(Text)
+    image_320_180 = Column(Text)
 
     comments = relationship('Comment', back_populates='video',
                             cascade='all, delete-orphan')
