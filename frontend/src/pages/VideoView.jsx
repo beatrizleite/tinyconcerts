@@ -2,10 +2,12 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import VideoPlayer from "../components/VideoPlayer";
 import CommentSection from "../components/CommentSection";
-import { ThumbsUp, Heart } from "lucide-react"
+import { ThumbsUp, Heart, Flag } from "lucide-react"
 import { useAuth } from "../context/AuthContext";
 import { toast, ToastContainer, Bounce } from "react-toastify";
 import StarRating from "../components/ui/StarRating"
+import Modal from "../components/ui/Modal"
+import { useNavigate } from 'react-router-dom';
 
   
 export default function VideoView() {
@@ -24,23 +26,25 @@ export default function VideoView() {
   const [rating, setRating] = useState(0);
   const [ratingCooldown, setRatingCooldown] = useState(false);
 
+  const [reportCooldown, setReportCooldown] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+
+  const navigate = useNavigate();
+
 useEffect(() => {
   const fetchVideo = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Busca o vídeo
       const videoRes = await fetch(`${import.meta.env.VITE_API_URL}/api/video?video_id=${id}`);
-      if (!videoRes.ok) throw new Error('Erro ao buscar vídeo');
+      if (!videoRes.ok) throw new Error('Error getting the video');
       const videoData = await videoRes.json();
       setVideo(videoData);
       if (videoData.rating) setRating(videoData.rating);
 
-      // Se não estiver autenticado, não verifica likes/favoritos
-      if (!isAuthenticated || !token) return;
+      if (!isAuthenticated || !token) navigate('/');
 
-      // Busca likes e favoritos do utilizador
       const [likeRes, favRes] = await Promise.all([
         fetch(`${import.meta.env.VITE_API_URL}/api/like/user`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -53,7 +57,6 @@ useEffect(() => {
       const likesData = await likeRes.json();
       const favData = await favRes.json();
 
-      // Extrai os IDs dos vídeos
       const likedIds = likesData.likes?.map(v => v.video_id) || [];
       const favoritedIds = favData.favorites?.map(v => v.video_id) || [];
 
@@ -177,10 +180,54 @@ const handleFavorite = async () => {
   };
 
 
+  const handleReport = async (reason) => {
+    if (!isAuthenticated) {
+      toast.warning("Please log in to report this video!");
+      return;
+    }
+    if (reportCooldown) return;
+    setReportCooldown(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/report`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          video_id: parseInt(id),
+          report_reason: reason,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to report video");
+
+      toast.success("Video reported successfully!");
+      setShowReportModal(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to submit report");
+    } finally {
+      setTimeout(() => setReportCooldown(false), 1000);
+    }
+  };
+
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-PT');
   };
+
+  const reportReasons = [
+    "Inappropriate content",
+    "Spam", 
+    "Harassment",
+    "Violence",
+    "Copyright infringement",
+    "Misinformation",
+    "Other"
+  ];
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-white">
@@ -254,30 +301,40 @@ const handleFavorite = async () => {
 
           <VideoPlayer url={video.video_link} />
           
-          <div className="flex gap-4 mt-4 items-center">
-            <button 
-              onClick={handleLike}
-              disabled={likeCooldown}
-              className="flex flex-col items-center justify-center gap-1 cursor-pointer">
-              <ThumbsUp fill={liked ? "#2e9aff" : "none"} /> Like
-            </button>
-            <button
-              onClick={handleFavorite}
-              disabled={favoriteCooldown}
-              className="flex flex-col items-center justify-center gap-1 cursor-pointer">
-              <Heart fill={favorited ? "#ff2e63" : "none"} /> Favorite
-            </button>
-            <div className="flex flex-col items-center gap-1">
-              <div className="flex flex-col items-center justify-center gap-1 cursor-pointer">
-                <StarRating
-                  initialRating={rating}
-                  onRate={handleRating}
-                  disabled={ratingCooldown}
-                />
-                <span>Rate</span>
+          <div className="flex gap-4 mt-4 items-center justify-between">
+            <div className="flex gap-4 items-center">
+              <button 
+                onClick={handleLike}
+                disabled={likeCooldown}
+                className="flex flex-col items-center justify-center gap-1 cursor-pointer">
+                <ThumbsUp fill={liked ? "#2e9aff" : "none"} /> Like
+              </button>
+              <button
+                onClick={handleFavorite}
+                disabled={favoriteCooldown}
+                className="flex flex-col items-center justify-center gap-1 cursor-pointer">
+                <Heart fill={favorited ? "#ff2e63" : "none"} /> Favorite
+              </button>
+              <div className="flex flex-col items-center gap-1">
+                <div className="flex flex-col items-center justify-center gap-1 cursor-pointer">
+                  <StarRating
+                    initialRating={rating}
+                    onRate={handleRating}
+                    disabled={ratingCooldown}
+                  />
+                  <span>Rate</span>
+                </div>
               </div>
             </div>
+            <button
+              onClick={() => setShowReportModal(true)}
+              disabled={reportCooldown}
+              className="flex flex-col items-center justify-center gap-1 cursor-pointer text-red-400 hover:text-red-300 transition-colors">
+              <Flag size={20} />
+              Report
+            </button>
           </div>
+          
           {video.description && (
             <div className="mt-4 p-4 bg-gray-800 rounded">
               <h3 className="text-lg font-semibold mb-2">Description</h3>
@@ -293,6 +350,29 @@ const handleFavorite = async () => {
           <p className="text-white text-lg">Video not found... &#128577;</p>
         </div>
       )}
+      
+      <Modal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        title="Report Video"
+      >
+        <div className="text-gray-300 mb-4">
+          <p>Why are you reporting this video?</p>
+        </div>
+        <div className="space-y-2">
+          {reportReasons.map((reason) => (
+            <button
+              key={reason}
+              onClick={() => handleReport(reason)}
+              disabled={reportCooldown}
+              className="w-full text-left p-2 rounded hover:bg-gray-700 transition-colors text-white disabled:opacity-50 cursor-pointer"
+            >
+              {reason}
+            </button>
+          ))}
+        </div>
+      </Modal>
+      
       <ToastContainer
         position="bottom-right"
         autoClose={5000}
