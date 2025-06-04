@@ -36,7 +36,7 @@ def update_like_status():
 @jwt_required()
 def get_likes_per_user():
     user_id = get_jwt_identity()
-    likes = like_service.get_likes_for_user(user_id)
+    likes = like_service.get_likes_by_user(user_id)
     return jsonify({
         "user_id": user_id,
         "likes": likes
@@ -50,7 +50,7 @@ def get_likes_per_video():
     if not video_id or not video_id.isdigit():
         return jsonify({"error": "Missing or invalid video_id"}), 400
 
-    likes = like_service.get_likes_for_video(int(video_id))
+    likes = like_service.get_likes_by_video(int(video_id))
     return jsonify({
         "video_id": video_id,
         "likes": likes

@@ -15,7 +15,14 @@ class LikeRepo:
             video_id=video_id).first()
 
     def get_by_user(self, user_id: int):
-        return self.db.query(Like).filter(Like.user_id == user_id).all()
+         return (
+        self.db.query(Like)
+        .join(Like.video)  # Faz join com a tabela Video
+        .filter(Like.user_id == user_id, Like.like.is_(True))
+        .all()
+    )
+
+
 
     def get_by_video(self, video_id: int):
         return self.db.query(Like).filter(Like.video_id == video_id).all()

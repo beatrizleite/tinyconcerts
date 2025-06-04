@@ -26,6 +26,8 @@ class Video(Base):
                            cascade='all, delete-orphan')
     favorites = relationship('Favorite', back_populates='video',
                              cascade='all, delete-orphan')
+    reports = relationship("Report", back_populates="video",
+                           cascade="all, delete-orphan")
 
     def to_dict(self):
         return {

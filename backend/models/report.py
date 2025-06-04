@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, Text, Float
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from models.base import Base
+
 
 class Report(Base):
     __tablename__ = 'reports'
@@ -9,4 +10,9 @@ class Report(Base):
     video_id = Column(Integer, ForeignKey('videos.id'), nullable=True)
     comment_id = Column(Integer, ForeignKey('comments.id'), nullable=True)
     report_reason = Column(String(100))
-    status = Column(String(100))  # e.g., approved / rejected
+    status = Column(String(100))
+
+    video = relationship("Video", back_populates="reports",
+                         foreign_keys=[video_id])
+    comment = relationship("Comment", back_populates="reports",
+                           foreign_keys=[comment_id])

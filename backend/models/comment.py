@@ -13,3 +13,5 @@ class Comment(Base):
 
     user = relationship('User', back_populates='comments')
     video = relationship('Video', back_populates='comments')
+    reports = relationship("Report", back_populates="comment",
+                           cascade="all, delete-orphan")

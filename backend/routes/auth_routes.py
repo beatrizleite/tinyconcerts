@@ -71,11 +71,17 @@ def login():
     if not user:
         return jsonify({"error": "Invalid credentials"}), 401
 
-    access_token = create_access_token(identity=str(user.id))
+    # ✅ Gera token com o role incluído como claim
+    access_token = create_access_token(
+        identity=str(user.id),
+        additional_claims={"role": user.role}
+    )
     refresh_token = create_refresh_token(identity=str(user.id))
+
     return jsonify({
         "id": user.id,
         "username": user.username,
         "access_token": access_token,
         "refresh_token": refresh_token
     }), 200
+

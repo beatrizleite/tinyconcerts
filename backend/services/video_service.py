@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Dict, Optional
 from models.video import Video
 from repositories.video_repo import VideoRepo
 from services.like_service import LikeService
@@ -44,9 +44,9 @@ class VideoService:
             raise NotFoundError(f"Video with id {video_id} not found.")
 
         video_data = video.to_dict()
-
         like_count = self.like_service.get_likes_by_video(video_id)
         video_data['like_count'] = like_count
+
         if user_id:
             liked = self.like_service.is_liked_by_user(user_id, video_id)
             favorited = self.favorite_service.is_favorited_by_user(user_id,
@@ -63,6 +63,7 @@ class VideoService:
         video = self.repo.get_by_id(video_id)
         if not video:
             raise NotFoundError(f"Video with id {video_id} not found.")
+
         self._update_fields(video, data, [
             'title', 'description', 'video_link', 'category',
             'published_at', 'owner', 'owner_url', 'image_320_180'
@@ -76,7 +77,34 @@ class VideoService:
         self.repo.delete(video)
 
     def search_videos(self, keyword, page, per_page):
+        """Legacy method - kept for backward compatibility"""
         return self.repo.search_videos(keyword, page, per_page)
+
+    def search_videos_with_filters(self, keyword: Optional[str] = None,
+                                   filters: Dict = None, page: int = 1,
+                                   per_page: int = 10):
+        """Enhanced search with filters"""
+        if filters is None:
+            filters = {}
+        return self.repo.search_videos_with_filters(keyword,
+                                                    filters,
+                                                    page,
+                                                    per_page)
+
+    def get_all_videos_with_filters(self, filters: Dict = None,
+                                    page: int = 1, per_page: int = 10):
+        """Get all videos with optional filters"""
+        if filters is None:
+            filters = {}
+        return self.repo.get_all_videos_with_filters(filters, page, per_page)
+
+    def get_all_categories(self) -> List[str]:
+        """Get all unique categories"""
+        return self.repo.get_all_categories()
+
+    def get_all_owners(self) -> List[str]:
+        """Get all unique owners"""
+        return self.repo.get_all_owners()
 
     def report_video(self, video_id: int, report_data: dict) -> bool:
         logger.info(f"Video {video_id} reported with data: {report_data}")
@@ -89,8 +117,7 @@ class VideoService:
         """
         ext = file.filename.rsplit('.', 1)[-1].lower()
         if ext not in ['xls', 'xlsx', 'csv']:
-            raise ValueError("Invalid file type. "
-                             "Only xls, xlsx, and csv are supported.")
+            raise ValueError("Invalid file type. Only xls, xlsx, and csv are supported.")
 
         try:
             if ext == 'csv':
@@ -106,22 +133,16 @@ class VideoService:
             video_link = row.get('video_link')
             thumbnail = row.get('image_320_180')
 
-            if (pd.notna(title)
-                    and pd.notna(video_link)
-                    and pd.notna(thumbnail)):
+            if (pd.notna(title) and pd.notna(video_link) and pd.notna(thumbnail)):
                 video_data = {
                     'title': str(title),
                     'video_link': str(video_link),
                     'image_320_180': str(thumbnail),
-                    'description': str(row.get('description')) if pd.notna(
-                        row.get('description')) else None,
-                    'category': str(row.get('category')) if pd.notna(
-                        row.get('category')) else None,
+                    'description': str(row.get('description')) if pd.notna(row.get('description')) else None,
+                    'category': str(row.get('category')) if pd.notna(row.get('category')) else None,
                     'published_at': row.get('published_at'),
-                    'owner': str(row.get('owner')) if pd.notna(
-                        row.get('owner')) else None,
-                    'owner_url': str(row.get('owner_url')) if pd.notna(
-                        row.get('owner_url')) else None
+                    'owner': str(row.get('owner')) if pd.notna(row.get('owner')) else None,
+                    'owner_url': str(row.get('owner_url')) if pd.notna(row.get('owner_url')) else None
                 }
                 video = self.create_video(video_data)
                 created_video_ids.append(video.id)
@@ -136,19 +157,15 @@ class VideoService:
 
     def get_most_recent_videos(self, limit=10):
         buffer_limit = limit * 5
-
         videos = self.repo.get_most_recent_videos(limit=buffer_limit)
-
         seen_titles = set()
         unique_videos = []
-
         for video in videos:
             if video.title not in seen_titles:
                 unique_videos.append(video)
                 seen_titles.add(video.title)
             if len(unique_videos) == limit:
                 break
-
         return unique_videos
 
     def _update_fields(self, obj, data: dict, fields: List[str]) -> None:
@@ -157,6 +174,7 @@ class VideoService:
                 setattr(obj, field, data[field])
 
     def get_all_videos(self, page, per_page):
+        """Legacy method - kept for backward compatibility"""
         query = self.repo.get_all_videos()
         total = query.count()
         videos = query.offset((page - 1) * per_page).limit(per_page).all()
