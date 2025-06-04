@@ -7,7 +7,6 @@ import { useAuth } from "../context/AuthContext";
 import { toast, ToastContainer, Bounce } from "react-toastify";
 import StarRating from "../components/ui/StarRating"
 import Modal from "../components/ui/Modal"
-import { useNavigate } from 'react-router-dom';
 
   
 export default function VideoView() {
@@ -29,8 +28,6 @@ export default function VideoView() {
   const [reportCooldown, setReportCooldown] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
 
-  const navigate = useNavigate();
-
 useEffect(() => {
   const fetchVideo = async () => {
     try {
@@ -43,7 +40,7 @@ useEffect(() => {
       setVideo(videoData);
       if (videoData.rating) setRating(videoData.rating);
 
-      if (!isAuthenticated || !token) navigate('/');
+      if (!isAuthenticated || !token) return;
 
       const [likeRes, favRes] = await Promise.all([
         fetch(`${import.meta.env.VITE_API_URL}/api/like/user`, {
