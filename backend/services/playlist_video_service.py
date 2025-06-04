@@ -4,6 +4,15 @@ class PlaylistVideoService:
         self.video_repo = video_repo
         self.playlist_video_repo = playlist_video_repo
 
+    def get_playlist_videos_paginated(self, db, playlist_id, page, per_page):
+        if not self.playlist_repo.get_by_id(playlist_id):
+            raise ValueError("Playlist not found")
+
+        videos_data = self.playlist_video_repo.get_videos_by_playlist_paginated(
+            db, playlist_id, page, per_page
+        )
+        return videos_data
+
     def add_video_to_playlist(self, db, playlist_id, video_id):
         if not self.playlist_repo.get_by_id(playlist_id):
             raise ValueError("Playlist not found")

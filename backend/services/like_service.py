@@ -25,7 +25,15 @@ class LikeService:
         return self.repo.get_like_count_by_user(user_id)
 
     def get_likes_by_user(self, user_id: int):
-        return self.repo.get_like_count_by_user(user_id)
+        likes = self.repo.get_by_user(user_id)
+        return [{
+        "id": like.id,
+        "video_id": like.video.id,
+        "title": like.video.title,
+        "image_320_180": like.video.image_320_180,
+        "uploaded": like.video.published_at.split("T")[0]  # remove a hora, fica só a data
+    } for like in likes]
+
 
     def get_likes_by_video(self, video_id: int):
         return self.repo.get_like_count_by_video(video_id)

@@ -29,7 +29,15 @@ class FavoriteService:
         return self.repo.get_favorite_count_by_user(user_id)
 
     def get_favorites_by_user(self, user_id: int):
-        return self.repo.get_by_user(user_id)
+        favorites = self.repo.get_by_user(user_id)
+        return [{
+        "id": favorite.id,
+        "video_id": favorite.video.id,
+        "title": favorite.video.title,
+        "image_320_180": favorite.video.image_320_180,
+        "uploaded": favorite.video.published_at.split("T")[0]  # remove a hora, fica só a data
+    } for favorite in favorites]
+
 
     def get_favorites_by_video(self, video_id: int):
         return self.repo.get_by_video(video_id)
