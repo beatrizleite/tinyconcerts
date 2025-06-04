@@ -41,6 +41,9 @@ const VideoCard = ({ video, onClick, isDragging, dragged }) => {
         <h3 className="text-white font-medium text-base leading-tight mb-1 line-clamp-2 group-hover:text-red-400 transition-colors">
           {video.title}
         </h3>
+        <div className="text-gray-400 text-sm space-y-0.5">
+          <p>{video.uploadTime}</p>
+        </div>
       </div>
     </div>
   );

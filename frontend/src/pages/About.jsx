@@ -48,7 +48,7 @@ export default function About() {
           <h3 className="text-2xl font-semibold mb-4">Ready to discover your next favorite concert?</h3>
           <a
             href="/videos"
-            className="inline-block mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full shadow-md transition"
+            className="inline-block mt-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-full shadow transition"
           >
             Explore Videos Now
           </a>
