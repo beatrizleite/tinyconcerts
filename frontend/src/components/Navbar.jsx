@@ -135,11 +135,13 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
                                         Profile
                                     </Link>
                                 </li>
-                                <li>
-                                    <Link to='/admin' className='block p-2 hover:bg-red-500 !text-white hover:!text-white rounded-md cursor-pointer'>
-                                        Admin
-                                    </Link>
-                                </li>
+                                {role === 1 && (
+                                            <li>
+                                                <Link to='/admin' className='block px-4 py-2 hover:bg-red-500 !text-white hover:!text-white rounded-md cursor-pointer'>
+                                                    Admin
+                                                </Link>
+                                            </li>
+                                        )}
 
                                 <li onClick={logout} className="px-4 py-2 hover:bg-red-500 rounded-md cursor-pointer">
                                     Logout
