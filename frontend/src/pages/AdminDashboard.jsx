@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import Modal from '../components/ui/Modal';
 
 const VIDEOS_PER_PAGE = 12;
 
@@ -45,6 +46,7 @@ export default function AdminDashboard() {
     const closeModal = () => {
         setEditingVideo(null);
         setModalOpen(false);
+        setImportFile(null); // Reset import file when closing modal
     };
 
     const handleDelete = async (id) => {
@@ -204,25 +206,23 @@ export default function AdminDashboard() {
                 </div>
             )}
 
-            {modalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 flex items-center justify-center">
-                    <VideoModal
-                        video={editingVideo}
-                        onClose={closeModal}
-                        onRefresh={() => fetchVideos(currentPage)}
-                        token={token}
-                        importRef={importRef}
-                        importFile={importFile}
-                        handleImportFileChange={handleImportFileChange}
-                        handleImportSubmit={handleImportSubmit}
-                    />
-                </div>
-            )}
+            <Modal isOpen={modalOpen} onClose={closeModal}>
+                <VideoModalContent
+                    video={editingVideo}
+                    onClose={closeModal}
+                    onRefresh={() => fetchVideos(currentPage)}
+                    token={token}
+                    importRef={importRef}
+                    importFile={importFile}
+                    handleImportFileChange={handleImportFileChange}
+                    handleImportSubmit={handleImportSubmit}
+                />
+            </Modal>
         </div>
     );
 }
 
-function VideoModal({ video, onClose, onRefresh, token, importRef, importFile, handleImportFileChange, handleImportSubmit }) {
+function VideoModalContent({ video, onClose, onRefresh, token, importRef, importFile, handleImportFileChange, handleImportSubmit }) {
     const [form, setForm] = useState({
         title: video?.title || "",
         description: video?.description || "",
@@ -263,8 +263,7 @@ function VideoModal({ video, onClose, onRefresh, token, importRef, importFile, h
     };
 
     return (
-        <div className="bg-gray-900 p-8 rounded-xl w-full max-w-lg relative shadow-lg">
-            <button onClick={onClose} className="absolute top-4 right-6 text-white text-xl font-bold">×</button>
+        <div className="w-full">
             <h2 className="text-2xl font-bold text-white mb-6 text-center">
                 {video ? "Edit Video" : "Create New Video"}
             </h2>
@@ -319,7 +318,7 @@ function VideoModal({ video, onClose, onRefresh, token, importRef, importFile, h
                 </div>
                 <div>
                     <label className="block text-sm font-medium">Description</label>
-                    <textarea name="description" value={form.description} onChange={handleChange} className="w-full p-2 bg-gray-700 rounded" />
+                    <textarea name="description" value={form.description} onChange={handleChange} className="w-full p-2 bg-gray-700 rounded" rows="3" />
                 </div>
                 <button type="submit" className="mt-3 w-full bg-green-600 hover:bg-green-700 py-2 rounded">
                     {video ? "Update" : "Create"}

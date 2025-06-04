@@ -25,17 +25,37 @@ class VideoService:
             if not data.get(field):
                 raise ValueError(f"{field} is required.")
 
+        validated_data = self._validate_and_truncate_data(data)
+
         video = Video(
-            title=data.get('title'),
-            description=data.get('description'),
-            video_link=data.get('video_link'),
-            category=data.get('category'),
-            published_at=data.get('published_at'),
-            owner=data.get('owner'),
-            owner_url=data.get('owner_url'),
-            image_320_180=data.get('image_320_180')
+            title=validated_data.get('title'),
+            description=validated_data.get('description'),
+            video_link=validated_data.get('video_link'),
+            category=validated_data.get('category'),
+            published_at=validated_data.get('published_at'),
+            owner=validated_data.get('owner'),
+            owner_url=validated_data.get('owner_url'),
+            image_320_180=validated_data.get('image_320_180')
         )
         return self.repo.add(video)
+
+    def _validate_and_truncate_data(self, data: dict) -> dict:
+        """Validate and truncate data to fit database constraints"""
+        validated = data.copy()
+        
+        if 'title' in validated and validated['title']:
+            validated['title'] = validated['title'][:100]
+        
+        if 'owner' in validated and validated['owner']:
+            validated['owner'] = validated['owner'][:100]  # Adjust based on your schema
+        
+        if 'category' in validated and validated['category']:
+            validated['category'] = validated['category'][:50]  # Adjust based on your schema
+        
+        if 'description' in validated and validated['description']:
+            validated['description'] = validated['description'][:1000]  # Adjust as needed
+        
+        return validated
 
     def get_video_by_id(self, video_id: int,
                         user_id: int | None = None) -> dict:

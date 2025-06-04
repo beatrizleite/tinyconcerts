@@ -1,7 +1,5 @@
 from models.video import Video
 from models.like import Like
-from sqlalchemy.sql import func
-from sqlalchemy import distinct, or_, cast, Date
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime
 
@@ -14,10 +12,14 @@ class VideoRepo:
         return self.db.query(Video).get(video_id)
 
     def add(self, video: Video):
-        self.db.add(video)
-        self.db.commit()
-        self.db.refresh(video)
-        return video
+        try:
+            self.db.add(video)
+            self.db.commit()
+            self.db.refresh(video)
+            return video
+        except Exception as e:
+            self.db.rollback()
+            raise e
 
     def update(self, video: Video):
         self.db.commit()
